@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Node.js
+node_modules/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development
+*.log
+.env
+
+# Chat data (persistent storage)
+chat-data.json
+.vercel
+
+# Documentation (keep local, don't push to GitHub)
+SECURITY.md
+BAN_MANAGEMENT.md
+MONGODB_SETUP.md
+DEPLOY_BACKEND.md
+CHAT_SETUP.md
+RENDER_STORAGE.md

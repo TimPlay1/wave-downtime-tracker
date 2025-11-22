@@ -1,0 +1,12 @@
+How to Downgrade Roblox Using FISHSTRAP
+
+Open Ocean → go to Settings → find Roblox Version and change production to version-8e6e698468a04d3f.
+Restart Ocean — the version indicator on the main tab should no longer be red.
+Download the file from Dev Announcements and open it once it’s done downloading.
+Press Windows + R, type %localappdata%, and hit Enter.
+Go to Fishstrap → Versions and open the folder with random letters/numbers.
+Paste the downloaded folder into the Fishstrap folder and choose Replace the files in destination when prompted.
+
+Now you're all set!
+
+PS if you get a version missmatch, uninstall Fishstrap from control panel and do NOT save the settings, then reinstall it and don't touch the settings and do the following steps

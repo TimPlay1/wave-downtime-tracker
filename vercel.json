@@ -1,0 +1,27 @@
+{
+  "functions": {
+    "api/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/wave",
+      "destination": "/api/wave.js"
+    },
+    {
+      "source": "/api/roblox",
+      "destination": "/api/roblox.js"
+    },
+    {
+      "source": "/api/test-notification",
+      "destination": "/api/test-notification.js"
+    },
+    {
+      "source": "/downgrade",
+      "destination": "/downgrade.html"
+    }
+  ]
+}
+

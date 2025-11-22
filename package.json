@@ -1,0 +1,33 @@
+{
+  "name": "wave-downtime-tracker",
+  "version": "1.0.0",
+  "description": "Real-time downtime tracker for Wave exploit with chat",
+  "scripts": {
+    "dev": "python proxy_server.py",
+    "chat": "node chat-server.js",
+    "chat:dev": "nodemon chat-server.js"
+  },
+  "keywords": [
+    "wave",
+    "downtime",
+    "tracker",
+    "roblox",
+    "chat"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongodb": "^7.0.0",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

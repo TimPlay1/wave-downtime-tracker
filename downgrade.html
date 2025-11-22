@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Downgrade - Wave Downtime Tracker</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .downgrade-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .downgrade-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .downgrade-logo {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .downgrade-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .downgrade-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: rgb(251, 191, 36);
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .downgrade-content {
+            backdrop-filter: blur(8px);
+            background-color: rgba(15, 23, 36, 0.6);
+            background-image: url('https:
+            background-size: cover;
+            border: 0.8px solid rgb(53, 81, 104);
+            border-radius: 16px;
+            padding: 48px;
+            filter: drop-shadow(rgba(0, 0, 0, 0.04) 0px 10px 8px) drop-shadow(rgba(0, 0, 0, 0.1) 0px 4px 3px);
+        }
+
+        .downgrade-subtitle {
+            font-size: 28px;
+            font-weight: 600;
+            color: rgb(147, 197, 253);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .downgrade-subtitle .brand-link {
+            top: 0;
+        }
+
+        .downgrade-warning .brand-link {
+            top: 4px;
+        }
+
+        .downgrade-steps {
+            list-style: none;
+            counter-reset: step-counter;
+            padding: 0;
+            margin: 0;
+        }
+
+        .downgrade-step {
+            counter-increment: step-counter;
+            margin-bottom: 32px;
+            padding-left: 60px;
+            position: relative;
+            font-size: 18px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .downgrade-step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgb(147, 197, 253), rgb(59, 130, 246));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: rgb(15, 23, 36);
+            box-shadow: 0 4px 12px rgba(147, 197, 253, 0.4);
+        }
+
+        .downgrade-step strong {
+            color: rgb(251, 191, 36);
+            font-weight: 600;
+        }
+
+        .downgrade-step code {
+            background: rgba(15, 23, 30, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: rgb(134, 239, 172);
+            font-size: 16px;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            position: relative;
+            top: 3px;
+        }
+
+        .brand-link:hover {
+            border-bottom-color: currentColor;
+            transform: translateY(-1px);
+        }
+
+        .brand-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .wave-link {
+            color: rgb(147, 197, 253);
+        }
+
+        .fishstrap-link {
+            color: rgb(251, 146, 60);
+        }
+
+        .copyable-code {
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .copyable-code:hover {
+            background: rgba(34, 197, 94, 0.2);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+        }
+
+        .copyable-code::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: rgba(15, 23, 36, 0.95);
+            backdrop-filter: blur(8px);
+            color: rgb(147, 197, 253);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 1001;
+            text-shadow: 0 0 10px rgba(147, 197, 253, 0.8);
+        }
+
+        .copyable-code::after {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 3px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgb(15, 23, 36);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .copyable-code:hover::before,
+        .copyable-code:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .tooltip-text {
+            position: relative;
+            cursor: help;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 3px;
+        }
+
+        .tooltip-text::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.7);
+            transform-origin: center bottom;
+            max-width: 90vw;
+            max-height: 80vh;
+            width: auto;
+            height: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1001;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            object-fit: contain;
+        }
+
+        .tooltip-text[style*="gotosettings"]::before {
+            content: url('gotosettings.png');
+        }
+
+        .tooltip-text[style*="findRobloxVersion"]::before {
+            content: url('findRobloxVersion.png');
+        }
+
+        .tooltip-text:hover::before {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(0.7);
+        }
+
+        .emoji-icon {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .download-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            filter: brightness(0) saturate(100%) invert(100%);
+        }
+
+        .windows-icon {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin: 0 2px;
+            filter: brightness(0) saturate(100%) invert(100%);
+        }
+
+        .downgrade-note {
+            margin-top: 40px;
+            padding: 24px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            font-size: 18px;
+            line-height: 1.6;
+            color: rgb(134, 239, 172);
+            font-weight: 500;
+        }
+
+        .downgrade-warning {
+            margin-top: 32px;
+            padding: 24px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgb(252, 165, 165);
+        }
+
+        .downgrade-warning strong {
+            color: rgb(239, 68, 68);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 16px 32px;
+            background: rgb(147, 197, 253);
+            color: rgb(15, 23, 30);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background: rgb(191, 219, 254);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(147, 197, 253, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .downgrade-title {
+                font-size: 32px;
+            }
+
+            .downgrade-content {
+                padding: 32px 20px;
+            }
+
+            .downgrade-subtitle {
+                font-size: 22px;
+            }
+
+            .downgrade-step {
+                font-size: 16px;
+                padding-left: 50px;
+            }
+
+            .downgrade-step::before {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            .downgrade-note,
+            .downgrade-warning {
+                font-size: 14px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-branding" id="siteBranding" data-tooltip="Click to copy!">wavestatus.com</div>
+    
+    <div class="downgrade-container">
+        <div class="downgrade-header">
+            <a href="/" style="display: inline-block;">
+                <img src="logo.png" alt="Wave Logo" class="downgrade-logo">
+            </a>
+            <h1 class="downgrade-title">How to Downgrade!</h1>
+        </div>
+
+        <div class="downgrade-content">
+            <h2 class="downgrade-subtitle">How to Downgrade Roblox Using <a href="https:
+
+            <ol class="downgrade-steps">
+                <li class="downgrade-step">
+                    Open <a href="https:
+                </li>
+                <li class="downgrade-step">
+                    Restart <a href="https:
+                </li>
+                <li class="downgrade-step">
+                    Download the file from <a href="https:
+                </li>
+                <li class="downgrade-step">
+                    Press <img src="windows.png" alt="Windows" class="windows-icon"> + <strong>R</strong>, type <code>%localappdata%</code>, and hit Enter.
+                </li>
+                <li class="downgrade-step">
+                    Go to <a href="https:
+                </li>
+                <li class="downgrade-step">
+                    Paste the downloaded folder into the <a href="https:
+                </li>
+            </ol>
+
+            <div class="downgrade-note">
+                <img src="happyemoji.webp" alt="🎉" class="emoji-icon"> <strong>Now you're all set!</strong>
+            </div>
+
+            <div class="downgrade-warning">
+                <strong><img src="warningemoji.webp" alt="⚠️" class="emoji-icon"> TROUBLESHOOTING:</strong><br>
+                If you get a <strong>version mismatch</strong>, uninstall <a href="https:
+            </div>
+
+            <div class="downgrade-warning" style="margin-top: 24px;">
+                <strong><img src="warningemoji.webp" alt="⚠️" class="emoji-icon"> IMPORTANT WARNING:</strong><br>
+                Using downgraded versions of Roblox is <strong>very likely to result in your Roblox account being banned</strong>. <a href="https:
+            </div>
+
+            <div style="text-align: center;">
+                <a href="/" class="back-button">Back to Main Page</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        const siteBranding = document.getElementById('siteBranding');
+        if (siteBranding) {
+            siteBranding.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText('wavestatus.com');
+                    const originalTooltip = siteBranding.getAttribute('data-tooltip');
+                    siteBranding.setAttribute('data-tooltip', 'Copied!');
+                    setTimeout(() => {
+                        siteBranding.setAttribute('data-tooltip', originalTooltip);
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            });
+        }
+
+        
+        const copyableCode = document.querySelector('.copyable-code');
+        if (copyableCode) {
+            copyableCode.addEventListener('click', async () => {
+                const textToCopy = copyableCode.textContent;
+                try {
+                    await navigator.clipboard.writeText(textToCopy);
+                    const originalTooltip = copyableCode.getAttribute('data-tooltip');
+                    copyableCode.setAttribute('data-tooltip', 'Copied!');
+                    setTimeout(() => {
+                        copyableCode.setAttribute('data-tooltip', originalTooltip);
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
