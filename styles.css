@@ -524,8 +524,7 @@ body {
 }
 
 .downgrade-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(147, 197, 253, 0.6);
+    background: linear-gradient(135deg, rgb(191, 219, 254), rgb(147, 197, 253));
 }
 
 @keyframes pulse {
@@ -534,8 +533,8 @@ body {
         transform: scale(1);
     }
     50% {
-        box-shadow: 0 4px 25px rgba(147, 197, 253, 0.6);
-        transform: scale(1.025);
+        box-shadow: 0 4px 23px rgba(147, 197, 253, 0.5);
+        transform: scale(1.008);
     }
 }
 
