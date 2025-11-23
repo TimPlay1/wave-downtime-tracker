@@ -510,13 +510,13 @@ body {
 .downgrade-button {
     display: inline-block;
     padding: 16px 48px;
-    background: linear-gradient(135deg, rgb(251, 191, 36), rgb(245, 158, 11));
+    background: linear-gradient(135deg, rgb(147, 197, 253), rgb(59, 130, 246));
     color: rgb(15, 23, 36);
     font-size: 20px;
     font-weight: 700;
     text-decoration: none;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 4px 20px rgba(147, 197, 253, 0.4);
     transition: all 0.3s ease;
     animation: pulse 2s infinite;
     text-transform: uppercase;
@@ -525,18 +525,17 @@ body {
 
 .downgrade-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(251, 191, 36, 0.6);
-    background: linear-gradient(135deg, rgb(252, 211, 77), rgb(251, 191, 36));
+    box-shadow: 0 8px 30px rgba(147, 197, 253, 0.6);
 }
 
 @keyframes pulse {
     0%, 100% {
-        box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
+        box-shadow: 0 4px 20px rgba(147, 197, 253, 0.4);
         transform: scale(1);
     }
     50% {
-        box-shadow: 0 4px 30px rgba(251, 191, 36, 0.8);
-        transform: scale(1.05);
+        box-shadow: 0 4px 25px rgba(147, 197, 253, 0.6);
+        transform: scale(1.025);
     }
 }
 
