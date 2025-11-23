@@ -628,7 +628,7 @@ body {
     pointer-events: none;
 }
 
-
+/* Радужная анимация для автора */
 .author-card::before {
     background: linear-gradient(
         90deg,
@@ -645,7 +645,7 @@ body {
     animation: rainbow 3s linear infinite;
 }
 
-
+/* Анимация в цветах Wave для ссылки */
 .wave-card::before {
     background: linear-gradient(
         90deg,
@@ -700,7 +700,7 @@ body {
     display: none;
 }
 
-
+/* Chat Section */
 .chat-section {
     background: rgba(53, 81, 104, 0.3);
     border: 1px solid rgba(147, 197, 253, 0.2);
@@ -1251,7 +1251,7 @@ body {
     }
 }
 
-
+/* FAQ Section */
 .faq-section {
     background: rgba(53, 81, 104, 0.3);
     border: 1px solid rgba(147, 197, 253, 0.2);
@@ -1380,7 +1380,7 @@ body {
     flex-shrink: 0;
 }
 
-
+/* Downgrade link styling */
 .downgrade-link {
     color: rgb(251, 191, 36);
     text-decoration: none;
@@ -1396,7 +1396,7 @@ body {
     text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
 }
 
-
+/* Responsive design */
 @media (max-width: 768px) {
     body {
         padding: 8px;

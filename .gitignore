@@ -28,11 +28,3 @@ Thumbs.db
 # Chat data (persistent storage)
 chat-data.json
 .vercel
-
-# Documentation (keep local, don't push to GitHub)
-SECURITY.md
-BAN_MANAGEMENT.md
-MONGODB_SETUP.md
-DEPLOY_BACKEND.md
-CHAT_SETUP.md
-RENDER_STORAGE.md

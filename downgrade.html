@@ -43,6 +43,8 @@
         .downgrade-content {
             backdrop-filter: blur(8px);
             background-color: rgba(15, 23, 36, 0.6);
+            background-image: url('https://getwave.gg/assets/CardBG.svg');
+            background-size: cover;
             border: 0.8px solid rgb(53, 81, 104);
             border-radius: 16px;
             padding: 48px;
@@ -368,26 +370,26 @@
         </div>
 
         <div class="downgrade-content">
-            <h2 class="downgrade-subtitle">How to Downgrade Roblox Using <a href="https://github.com/pizzaboxer/bloxstrap/releases/latest" target="_blank" class="downgrade-link">Restore Point</a></h2>
+            <h2 class="downgrade-subtitle">How to Downgrade Roblox Using <a href="https://fishstrap.org" class="brand-link fishstrap-link" target="_blank"><img src="fishstrap.png" alt="Fishstrap" class="brand-icon">FISHSTRAP</a></h2>
 
             <ol class="downgrade-steps">
                 <li class="downgrade-step">
-                    Open <a href="https://github.com/pizzaboxer/bloxstrap/releases/latest" target="_blank" class="downgrade-link">Bloxstrap</a>.
+                    Open <a href="https://getwave.gg" class="brand-link wave-link" target="_blank"><img src="wavebluelogo.webp" alt="Wave" class="brand-icon">Wave</a> → <span class="tooltip-text" style="--tooltip-image: url('gotosettings.png');">go to Settings</span> → <span class="tooltip-text" style="--tooltip-image: url('findRobloxVersion.png');">find Roblox Version</span> and change <code>production</code> to <code class="copyable-code" data-tooltip="Click to copy!">version-8e6e698468a04d3f</code>.
                 </li>
                 <li class="downgrade-step">
-                    Restart <a href="https://www.roblox.com" target="_blank" class="downgrade-link">Roblox</a>.
+                    Restart <a href="https://getwave.gg" class="brand-link wave-link" target="_blank"><img src="wavebluelogo.webp" alt="Wave" class="brand-icon">Wave</a> — the version indicator on the main tab should no longer be red.
                 </li>
                 <li class="downgrade-step">
-                    Download the file from <a href="https://github.com/2p2r/files/tree/main" target="_blank" class="downgrade-link">GitHub</a>.
+                    Download the file from <a href="https://rdd.whatexpsare.online/?channel=LIVE&binaryType=WindowsPlayer&version=version-8e6e698468a04d3f" class="brand-link" style="color: rgb(34, 197, 94);" target="_blank"><img src="download.png" alt="Download" class="download-icon">Dev Announcements</a> and open it once it's done downloading.
                 </li>
                 <li class="downgrade-step">
                     Press <img src="windows.png" alt="Windows" class="windows-icon"> + <strong>R</strong>, type <code>%localappdata%</code>, and hit Enter.
                 </li>
                 <li class="downgrade-step">
-                    Go to <a href="file:///%localappdata%/Roblox" class="downgrade-link">Roblox</a> folder.
+                    Go to <a href="https://fishstrap.org" class="brand-link fishstrap-link" target="_blank"><img src="fishstrap.png" alt="Fishstrap" class="brand-icon">Fishstrap</a> → Versions and open the folder with random letters/numbers.
                 </li>
                 <li class="downgrade-step">
-                    Paste the downloaded folder into the <a href="file:///%localappdata%/Roblox/Versions" class="downgrade-link">Versions</a> folder.
+                    Paste the downloaded folder into the <a href="https://fishstrap.org" class="brand-link fishstrap-link" target="_blank"><img src="fishstrap.png" alt="Fishstrap" class="brand-icon">Fishstrap</a> folder and choose <strong>Replace the files in destination</strong> when prompted.
                 </li>
             </ol>
 
@@ -397,12 +399,12 @@
 
             <div class="downgrade-warning">
                 <strong><img src="warningemoji.webp" alt="⚠️" class="emoji-icon"> TROUBLESHOOTING:</strong><br>
-                If you get a <strong>version mismatch</strong>, uninstall <a href="https://www.roblox.com/download" target="_blank" class="downgrade-link">Roblox</a> and try again.
+                If you get a <strong>version mismatch</strong>, uninstall <a href="https://fishstrap.org" class="brand-link fishstrap-link" target="_blank"><img src="fishstrap.png" alt="Fishstrap" class="brand-icon">Fishstrap</a> from Control Panel and <strong>DO NOT save the settings</strong>, then reinstall it and don't touch the settings and follow the steps above again.
             </div>
 
             <div class="downgrade-warning" style="margin-top: 24px;">
                 <strong><img src="warningemoji.webp" alt="⚠️" class="emoji-icon"> IMPORTANT WARNING:</strong><br>
-                Using downgraded versions of Roblox is <strong>very likely to result in your Roblox account being banned</strong>. <a href="https://getwave.gg" target="_blank" class="downgrade-link">Wave</a> and this website take no responsibility for any consequences.
+                Using downgraded versions of Roblox is <strong>very likely to result in your Roblox account being banned</strong>. <a href="https://getwave.gg" class="brand-link wave-link" target="_blank"><img src="wavebluelogo.webp" alt="Wave" class="brand-icon">Wave</a> administrators confirm there is a high chance of account bans, including for multi-accounting. <strong>Use at your own risk!</strong>
             </div>
 
             <div style="text-align: center;">
@@ -412,7 +414,7 @@
     </div>
 
     <script>
-        
+        // Site branding copy functionality
         const siteBranding = document.getElementById('siteBranding');
         if (siteBranding) {
             siteBranding.addEventListener('click', async () => {
@@ -429,7 +431,7 @@
             });
         }
 
-        
+        // Copyable version code functionality
         const copyableCode = document.querySelector('.copyable-code');
         if (copyableCode) {
             copyableCode.addEventListener('click', async () => {
