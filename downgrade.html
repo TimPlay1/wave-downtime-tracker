@@ -383,7 +383,7 @@
                     Download the file from <a href="https://rdd.whatexpsare.online/?channel=LIVE&binaryType=WindowsPlayer&version=version-8e6e698468a04d3f" class="brand-link" style="color: rgb(34, 197, 94);" target="_blank"><img src="download.png" alt="Download" class="download-icon">Dev Announcements</a> and open it once it's done downloading.
                 </li>
                 <li class="downgrade-step">
-                    Press <img src="windows.png" alt="Windows" class="windows-icon"> + <strong>R</strong>, type <code>%localappdata%</code>, and hit Enter.
+                    Press <img src="windows.png" alt="Windows" class="windows-icon"> + <strong>R</strong>, type <code class="copyable-code" data-tooltip="Click to copy!">%localappdata%</code>, and hit Enter.
                 </li>
                 <li class="downgrade-step">
                     Go to <a href="https://fishstrap.org" class="brand-link fishstrap-link" target="_blank"><img src="fishstrap.png" alt="Fishstrap" class="brand-icon">Fishstrap</a> → Versions and open the folder with random letters/numbers.
@@ -432,8 +432,8 @@
         }
 
         // Copyable version code functionality
-        const copyableCode = document.querySelector('.copyable-code');
-        if (copyableCode) {
+        const copyableCodes = document.querySelectorAll('.copyable-code');
+        copyableCodes.forEach(copyableCode => {
             copyableCode.addEventListener('click', async () => {
                 const textToCopy = copyableCode.textContent;
                 try {
@@ -447,7 +447,7 @@
                     console.error('Failed to copy:', err);
                 }
             });
-        }
+        });
     </script>
 </body>
 </html>
