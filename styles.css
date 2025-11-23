@@ -517,7 +517,7 @@ body {
     text-decoration: none;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(147, 197, 253, 0.4);
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
     animation: pulse 2s infinite;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -529,12 +529,10 @@ body {
 
 @keyframes pulse {
     0%, 100% {
-        box-shadow: 0 4px 20px rgba(147, 197, 253, 0.4);
         transform: scale(1);
     }
     50% {
-        box-shadow: 0 4px 23px rgba(147, 197, 253, 0.5);
-        transform: scale(1.008);
+        transform: scale(1.015);
     }
 }
 
