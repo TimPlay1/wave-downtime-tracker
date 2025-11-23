@@ -518,7 +518,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(147, 197, 253, 0.4);
     transition: background 0.3s ease;
-    animation: pulse 2s infinite;
+    animation: buttonPulse 2s infinite;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -527,7 +527,7 @@ body {
     background: linear-gradient(135deg, rgb(191, 219, 254), rgb(147, 197, 253));
 }
 
-@keyframes pulse {
+@keyframes buttonPulse {
     0%, 100% {
         transform: scale(1);
     }
