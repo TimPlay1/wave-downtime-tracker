@@ -468,6 +468,7 @@ io.on('connection', (socket) => {
                     nickname: deviceCodeUser.nickname,
                     socketId: socket.id,
                     avatarHue: deviceCodeUser.avatarHue,
+                    customAvatar: deviceCodeUser.customAvatar || null,
                     joinedAt: Date.now(),
                     isAdmin: deviceCodeUser.isAdmin,
                     ip: clientIP
@@ -486,6 +487,7 @@ io.on('connection', (socket) => {
                         id: deviceCodeUser.id,
                         nickname: deviceCodeUser.nickname,
                         avatarHue: deviceCodeUser.avatarHue,
+                        customAvatar: deviceCodeUser.customAvatar || null,
                         isAdmin: deviceCodeUser.isAdmin
                     },
                     deviceCode: null,
@@ -541,6 +543,7 @@ io.on('connection', (socket) => {
             nickname: nickname,
             socketId: socket.id,
             avatarHue: generateAvatarHue(),
+            customAvatar: null,
             joinedAt: Date.now(),
             isAdmin: isAdmin,
             ip: clientIP
@@ -558,6 +561,7 @@ io.on('connection', (socket) => {
             id: user.id,
             nickname: user.nickname,
             avatarHue: user.avatarHue,
+            customAvatar: null,
             isAdmin: user.isAdmin,
             ip: clientIP,
             sessionToken: sessionToken,
@@ -575,6 +579,7 @@ io.on('connection', (socket) => {
                 id: user.id,
                 nickname: user.nickname,
                 avatarHue: user.avatarHue,
+                customAvatar: null,
                 isAdmin: user.isAdmin
             },
             deviceCode: null,
@@ -656,6 +661,7 @@ io.on('connection', (socket) => {
             nickname: user.nickname,
             socketId: socket.id,
             avatarHue: user.avatarHue,
+            customAvatar: user.customAvatar || null,
             joinedAt: Date.now(),
             isAdmin: user.isAdmin,
             ip: clientIP
@@ -677,6 +683,7 @@ io.on('connection', (socket) => {
                 id: user.id,
                 nickname: user.nickname,
                 avatarHue: user.avatarHue,
+                customAvatar: user.customAvatar || null,
                 isAdmin: user.isAdmin
             },
             deviceCode: user.deviceCode,
@@ -791,6 +798,7 @@ io.on('connection', (socket) => {
             userId: user.id,
             nickname: user.nickname,
             avatarHue: user.avatarHue,
+            customAvatar: user.customAvatar || null,
             message: trimmedMessage,
             timestamp: Date.now()
         };
@@ -1088,6 +1096,70 @@ app.get('/api/wave-cache', async (req, res) => {
         console.error('Error loading cache:', error);
         res.status(500).json({ error: 'Failed to load cache' });
     }
+});
+
+// Admin endpoint to update user
+app.post('/api/admin/update-user', express.json(), (req, res) => {
+    const { oldNickname, newNickname, makeAdmin, customAvatar, adminKey } = req.body;
+    
+    // Simple security check - you should replace this with proper authentication
+    if (adminKey !== 'wave-admin-key-2025') {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    // Find user by old nickname
+    let userFound = null;
+    let userIdFound = null;
+    
+    for (const [userId, user] of registeredUsers) {
+        if (user.nickname.toLowerCase() === oldNickname.toLowerCase()) {
+            userFound = user;
+            userIdFound = userId;
+            break;
+        }
+    }
+    
+    if (!userFound) {
+        return res.status(404).json({ error: `User ${oldNickname} not found` });
+    }
+    
+    // Update user data
+    if (newNickname) {
+        userFound.nickname = newNickname;
+    }
+    
+    if (makeAdmin !== undefined) {
+        userFound.isAdmin = makeAdmin;
+    }
+    
+    if (customAvatar) {
+        userFound.customAvatar = customAvatar;
+    }
+    
+    registeredUsers.set(userIdFound, userFound);
+    
+    // Update active sessions if user is online
+    for (const [socketId, activeUser] of users) {
+        if (activeUser.id === userIdFound) {
+            if (newNickname) activeUser.nickname = newNickname;
+            if (makeAdmin !== undefined) activeUser.isAdmin = makeAdmin;
+            if (customAvatar) activeUser.customAvatar = customAvatar;
+            users.set(socketId, activeUser);
+        }
+    }
+    
+    saveData();
+    
+    res.json({
+        success: true,
+        message: 'User updated successfully',
+        user: {
+            id: userIdFound,
+            nickname: userFound.nickname,
+            isAdmin: userFound.isAdmin,
+            customAvatar: userFound.customAvatar
+        }
+    });
 });
 
 const PORT = process.env.PORT || 3000;

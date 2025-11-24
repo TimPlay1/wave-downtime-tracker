@@ -447,9 +447,15 @@ function displayMessage(data) {
         const isMefisto = data.nickname.toLowerCase() === 'mefisto';
         const avatarStyle = `filter: hue-rotate(${data.avatarHue}deg) saturate(1.5);`;
 
-        const avatarHTML = isMefisto
-            ? `<video src="mefistoavatar.mp4" class="chat-avatar-video" autoplay loop muted playsinline></video>`
-            : `<img src="userschaticons.png" class="chat-avatar" style="${avatarStyle}" alt="${escapeHtml(data.nickname)}">`;
+        let avatarHTML;
+        if (data.customAvatar) {
+            // Use custom avatar image
+            avatarHTML = `<img src="${data.customAvatar}" class="chat-avatar" alt="${escapeHtml(data.nickname)}">`;
+        } else if (isMefisto) {
+            avatarHTML = `<video src="mefistoavatar.mp4" class="chat-avatar-video" autoplay loop muted playsinline></video>`;
+        } else {
+            avatarHTML = `<img src="userschaticons.png" class="chat-avatar" style="${avatarStyle}" alt="${escapeHtml(data.nickname)}">`;
+        }
 
         // Check if message is a sticker
         const stickerMatch = data.message.match(/^\[STICKER:(.+)\]$/);
