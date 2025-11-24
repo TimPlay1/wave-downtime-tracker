@@ -341,22 +341,12 @@
         
         function updateTooltipPosition() {
             const rect = waveCard.getBoundingClientRect();
-            const tooltipActualHeight = 225; // Height before scale
-            const tooltipVisualHeight = tooltipActualHeight * 0.7; // Visual height after scale(0.7)
-            const gap = 12; // Small gap between tooltip and button
+            const tooltipWidth = 400 * 0.7;
+            const tooltipHeight = 225 * 0.7;
             
-            // Check if there's enough space above
-            const spaceAbove = rect.top;
-            
-            if (spaceAbove >= tooltipVisualHeight + gap + 20) {
-                // Position above the card with small gap
-                // Account for transform-origin: center bottom
-                tooltip.style.top = (rect.top - tooltipVisualHeight - gap) + 'px';
-            } else {
-                // Position below the card with small gap
-                tooltip.style.top = (rect.bottom + gap) + 'px';
-            }
-            
+            // Position above the card with large gap to prevent overlap
+            const topPosition = rect.top - tooltipHeight - 80;
+            tooltip.style.top = Math.max(20, topPosition) + 'px';
             tooltip.style.left = (rect.left + rect.width / 2) + 'px';
         }
         
@@ -416,15 +406,25 @@
             hideTooltip();
         });
         
-        // Hide tooltip immediately on scroll
-        window.addEventListener('scroll', () => {
+        // Fallback: hide tooltip if mouse leaves both elements
+        document.addEventListener('mousemove', (e) => {
             if (tooltip.classList.contains('visible')) {
-                isHovering = false;
-                tooltip.classList.remove('visible');
-                if (isPlaying) {
-                    video.pause();
-                    audio.pause();
-                    isPlaying = false;
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const cardRect = waveCard.getBoundingClientRect();
+                
+                const isOverTooltip = e.clientX >= tooltipRect.left && 
+                                     e.clientX <= tooltipRect.right && 
+                                     e.clientY >= tooltipRect.top && 
+                                     e.clientY <= tooltipRect.bottom;
+                
+                const isOverCard = e.clientX >= cardRect.left && 
+                                  e.clientX <= cardRect.right && 
+                                  e.clientY >= cardRect.top && 
+                                  e.clientY <= cardRect.bottom;
+                
+                if (!isOverTooltip && !isOverCard) {
+                    isHovering = false;
+                    hideTooltip();
                 }
             }
         });
@@ -434,6 +434,14 @@
             if (isPlaying && Math.abs(video.currentTime - audio.currentTime) > 0.3) {
                 audio.currentTime = video.currentTime;
             }
+        });
+        
+        // Update position on scroll/resize
+        window.addEventListener('scroll', () => {
+            if (isHovering) updateTooltipPosition();
+        });
+        window.addEventListener('resize', () => {
+            if (isHovering) updateTooltipPosition();
         });
     </script>
     <script defer src="https://analytics.vercel.com/script.js"></script>
