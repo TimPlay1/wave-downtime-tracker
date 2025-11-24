@@ -451,6 +451,17 @@ function displayMessage(data) {
             ? `<video src="mefistoavatar.mp4" class="chat-avatar-video" autoplay loop muted playsinline></video>`
             : `<img src="userschaticons.png" class="chat-avatar" style="${avatarStyle}" alt="${escapeHtml(data.nickname)}">`;
 
+        // Check if message is a sticker
+        const stickerMatch = data.message.match(/^\[STICKER:(.+)\]$/);
+        let messageContent;
+        
+        if (stickerMatch) {
+            const stickerFile = stickerMatch[1];
+            messageContent = `<img src="${stickerFile}" class="chat-sticker" alt="Sticker">`;
+        } else {
+            messageContent = linkifyDowngrade(data.message);
+        }
+
         messageDiv.innerHTML = `
             ${avatarHTML}
             <div class="message-content">
@@ -459,7 +470,7 @@ function displayMessage(data) {
                     <span class="message-time">${formatTime(data.timestamp)}</span>
                     ${isAdmin && !isOwnMessage ? `<button class="ban-button" onclick="banUser('${data.userId}', '${escapeHtml(data.nickname)}')">Ban</button>` : ''}
                 </div>
-                <div class="message-text">${linkifyDowngrade(data.message)}</div>
+                <div class="message-text">${messageContent}</div>
             </div>
         `;
     }
@@ -715,6 +726,75 @@ document.addEventListener('DOMContentLoaded', () => {
     if (generateBtn) {
         generateBtn.addEventListener('click', generateDeviceCode);
     }
+    
+    // Sticker functionality
+    const stickerBtn = document.getElementById('stickerBtn');
+    const stickerPicker = document.getElementById('stickerPicker');
+    let isStickerPickerPinned = false;
+    
+    if (stickerBtn && stickerPicker) {
+        // Click to toggle pinned state
+        stickerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isStickerPickerPinned = !isStickerPickerPinned;
+            
+            if (isStickerPickerPinned) {
+                stickerPicker.classList.add('visible');
+                stickerBtn.classList.add('active');
+            } else {
+                stickerPicker.classList.remove('visible');
+                stickerBtn.classList.remove('active');
+            }
+        });
+        
+        // Hover to show (if not pinned)
+        stickerBtn.addEventListener('mouseenter', () => {
+            if (!isStickerPickerPinned) {
+                stickerPicker.classList.add('visible');
+            }
+        });
+        
+        stickerBtn.addEventListener('mouseleave', () => {
+            if (!isStickerPickerPinned) {
+                setTimeout(() => {
+                    if (!stickerPicker.matches(':hover')) {
+                        stickerPicker.classList.remove('visible');
+                    }
+                }, 100);
+            }
+        });
+        
+        stickerPicker.addEventListener('mouseleave', () => {
+            if (!isStickerPickerPinned) {
+                stickerPicker.classList.remove('visible');
+            }
+        });
+        
+        // Click outside to close if pinned
+        document.addEventListener('click', (e) => {
+            if (isStickerPickerPinned && 
+                !stickerPicker.contains(e.target) && 
+                !stickerBtn.contains(e.target)) {
+                isStickerPickerPinned = false;
+                stickerPicker.classList.remove('visible');
+                stickerBtn.classList.remove('active');
+            }
+        });
+        
+        // Handle sticker selection
+        const stickerItems = stickerPicker.querySelectorAll('.sticker-item');
+        stickerItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const stickerFile = item.getAttribute('data-sticker');
+                sendSticker(stickerFile);
+                
+                // Close picker after selection
+                isStickerPickerPinned = false;
+                stickerPicker.classList.remove('visible');
+                stickerBtn.classList.remove('active');
+            });
+        });
+    }
 
     window.addEventListener('beforeunload', () => {
         if (socket && socket.connected) {
@@ -722,3 +802,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+function sendSticker(stickerFile) {
+    if (messageCooldown && !isAdmin) {
+        return;
+    }
+
+    if (!socket || !socket.connected) {
+        showError('Not connected to chat server');
+        return;
+    }
+
+    if (!currentUser) {
+        showError('You must set a nickname first');
+        return;
+    }
+
+    // Send sticker as a special message format
+    const stickerMessage = `[STICKER:${stickerFile}]`;
+    socket.emit('message', stickerMessage);
+
+    if (!isAdmin) {
+        startCooldown();
+    }
+}
