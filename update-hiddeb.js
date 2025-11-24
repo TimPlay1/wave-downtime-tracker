@@ -9,7 +9,7 @@ const data = JSON.stringify({
 });
 
 const options = {
-    hostname: 'wave-downtime-tracker.onrender.com',
+    hostname: 'wave-chat-server.onrender.com',
     port: 443,
     path: '/api/admin/update-user',
     method: 'POST',
