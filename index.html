@@ -348,12 +348,12 @@
             const spaceAbove = rect.top;
             const spaceBelow = window.innerHeight - rect.bottom;
             
-            if (spaceAbove >= tooltipHeight + 30) {
-                // Position above the card
-                tooltip.style.top = (rect.top - tooltipHeight - 20) + 'px';
+            if (spaceAbove >= tooltipHeight + 40) {
+                // Position above the card with gap
+                tooltip.style.top = (rect.top - tooltipHeight - 30) + 'px';
             } else {
-                // Position below the card
-                tooltip.style.top = (rect.bottom + 20) + 'px';
+                // Position below the card with gap
+                tooltip.style.top = (rect.bottom + 30) + 'px';
             }
             
             tooltip.style.left = (rect.left + rect.width / 2) + 'px';
