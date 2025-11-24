@@ -483,7 +483,7 @@ function displayMessage(data) {
         if (isMefisto) {
             adminBadge = '<span class="admin-crown">👑</span>';
         } else if (data.isAdmin) {
-            adminBadge = '<span class="admin-diamond">💎</span>';
+            adminBadge = '<img src="wavebluelogo.webp" class="admin-diamond" alt="Admin">';
         }
 
         // Ban button logic:
