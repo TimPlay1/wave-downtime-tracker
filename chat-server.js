@@ -498,7 +498,14 @@ io.on('connection', (socket) => {
 
                 const recentMessages = messages.filter(msg =>
                     msg.timestamp > Date.now() - MESSAGE_RETENTION_TIME
-                );
+                ).map(msg => {
+                    const msgUser = registeredUsers.get(msg.userId);
+                    return {
+                        ...msg,
+                        isAdmin: msgUser ? msgUser.isAdmin || false : false,
+                        customAvatar: msgUser ? msgUser.customAvatar || null : null
+                    };
+                });
                 socket.emit('messageHistory', recentMessages);
 
                 io.emit('userJoined', {
@@ -589,7 +596,14 @@ io.on('connection', (socket) => {
 
         const recentMessages = messages.filter(msg =>
             msg.timestamp > Date.now() - MESSAGE_RETENTION_TIME
-        );
+        ).map(msg => {
+            const msgUser = registeredUsers.get(msg.userId);
+            return {
+                ...msg,
+                isAdmin: msgUser ? msgUser.isAdmin || false : false,
+                customAvatar: msgUser ? msgUser.customAvatar || null : null
+            };
+        });
         socket.emit('messageHistory', recentMessages);
 
         io.emit('userJoined', {
@@ -694,7 +708,14 @@ io.on('connection', (socket) => {
 
         const recentMessages = messages.filter(msg =>
             msg.timestamp > Date.now() - MESSAGE_RETENTION_TIME
-        );
+        ).map(msg => {
+            const msgUser = registeredUsers.get(msg.userId);
+            return {
+                ...msg,
+                isAdmin: msgUser ? msgUser.isAdmin || false : false,
+                customAvatar: msgUser ? msgUser.customAvatar || null : null
+            };
+        });
         socket.emit('messageHistory', recentMessages);
 
         io.emit('userJoined', {
@@ -799,6 +820,7 @@ io.on('connection', (socket) => {
             nickname: user.nickname,
             avatarHue: user.avatarHue,
             customAvatar: user.customAvatar || null,
+            isAdmin: user.isAdmin || false,
             message: trimmedMessage,
             timestamp: Date.now()
         };

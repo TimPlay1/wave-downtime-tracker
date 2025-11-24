@@ -447,6 +447,16 @@ function displayMessage(data) {
         const isMefisto = data.nickname.toLowerCase() === 'mefisto';
         const avatarStyle = `filter: hue-rotate(${data.avatarHue}deg) saturate(1.5);`;
 
+        // Debug logging
+        if (data.nickname.toLowerCase() === 'hidden') {
+            console.log('Hidden user data:', {
+                nickname: data.nickname,
+                customAvatar: data.customAvatar,
+                isAdmin: data.isAdmin,
+                userId: data.userId
+            });
+        }
+
         let avatarHTML;
         if (data.customAvatar) {
             // Use custom avatar image
