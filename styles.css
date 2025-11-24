@@ -245,11 +245,59 @@ body {
     animation: bellRing 0.5s ease-in-out;
 }
 
+.bell-icon.ringing {
+    animation: bellRingContinuous 0.5s ease-in-out infinite;
+}
+
 @keyframes bellRing {
     0%, 100% { transform: rotate(0deg); }
     25% { transform: rotate(-15deg); }
     50% { transform: rotate(15deg); }
     75% { transform: rotate(-10deg); }
+}
+
+@keyframes bellRingContinuous {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-8deg); }
+}
+
+.notification-prompt {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    background: rgba(147, 197, 253, 0.95);
+    color: rgb(15, 23, 36);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(147, 197, 253, 0.4);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.notification-prompt.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.notification-prompt::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(147, 197, 253, 0.95);
 }
 
 .bell-icon {

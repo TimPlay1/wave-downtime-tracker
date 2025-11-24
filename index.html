@@ -200,11 +200,53 @@
         </a>
     </div>
     
+    <!-- Notification button prompt tooltip -->
+    <div id="notificationPrompt" class="notification-prompt">Enable notification!</div>
+    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="script.js?v=1732237000"></script>
     <script src="chat.js?v=1732237000"></script>
     <script src="faq.js?v=1732237000"></script>
     <script>
+        // Notification button prompt system
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationPrompt = document.getElementById('notificationPrompt');
+        const bellIcon = notificationBtn.querySelector('.bell-icon');
+        let promptInterval;
+        let hasHoveredNotificationBtn = false;
+        let isPromptActive = false;
+        
+        function showNotificationPrompt() {
+            if (!hasHoveredNotificationBtn && !notificationBtn.classList.contains('active')) {
+                isPromptActive = true;
+                notificationPrompt.classList.add('visible');
+                bellIcon.classList.add('ringing');
+                
+                setTimeout(() => {
+                    notificationPrompt.classList.remove('visible');
+                    bellIcon.classList.remove('ringing');
+                    isPromptActive = false;
+                }, 3000);
+            }
+        }
+        
+        // Start showing prompts every 10 seconds
+        if (!notificationBtn.classList.contains('active')) {
+            promptInterval = setInterval(showNotificationPrompt, 10000);
+            // Show first prompt after 2 seconds
+            setTimeout(showNotificationPrompt, 2000);
+        }
+        
+        notificationBtn.addEventListener('mouseenter', () => {
+            if (!hasHoveredNotificationBtn) {
+                hasHoveredNotificationBtn = true;
+                clearInterval(promptInterval);
+                notificationPrompt.classList.remove('visible');
+                bellIcon.classList.remove('ringing');
+                isPromptActive = false;
+            }
+        });
+        
         // Wave card video tooltip with synchronized audio
         const waveCard = document.querySelector('.wave-card');
         const tooltip = document.getElementById('waveCardTooltip');
