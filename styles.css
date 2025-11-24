@@ -1476,13 +1476,13 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    transform: translateX(-50%) translateY(10px) scale(0.7);
+    transform: translateX(-50%) scale(0.7);
     transform-origin: center bottom;
     width: 400px;
     height: 225px;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
     pointer-events: none;
     z-index: 10000;
     border-radius: 12px;
@@ -1503,7 +1503,6 @@ body {
 .wave-card-tooltip.visible {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0) scale(0.7);
 }
 
 .wave-card::after {
