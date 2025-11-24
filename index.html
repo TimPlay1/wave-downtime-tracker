@@ -342,8 +342,8 @@
             const tooltipWidth = 400 * 0.7;
             const tooltipHeight = 225 * 0.7;
             
-            // Position above the card
-            const topPosition = rect.top - tooltipHeight - 16;
+            // Position above the card with gap
+            const topPosition = rect.top - tooltipHeight - 20;
             tooltip.style.top = Math.max(20, topPosition) + 'px';
             tooltip.style.left = (rect.left + rect.width / 2) + 'px';
         }
@@ -402,6 +402,19 @@
         tooltip.addEventListener('mouseleave', () => {
             isHovering = false;
             hideTooltip();
+        });
+        
+        // Hide tooltip immediately on scroll
+        window.addEventListener('scroll', () => {
+            if (tooltip.classList.contains('visible')) {
+                isHovering = false;
+                tooltip.classList.remove('visible');
+                if (isPlaying) {
+                    video.pause();
+                    audio.pause();
+                    isPlaying = false;
+                }
+            }
         });
         
         // Keep video and audio in sync
