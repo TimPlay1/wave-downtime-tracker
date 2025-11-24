@@ -343,17 +343,17 @@
             const rect = waveCard.getBoundingClientRect();
             const tooltipWidth = 400 * 0.7;
             const tooltipHeight = 225 * 0.7;
+            const gap = 12; // Small gap between tooltip and button
             
             // Check if there's enough space above
             const spaceAbove = rect.top;
-            const spaceBelow = window.innerHeight - rect.bottom;
             
-            if (spaceAbove >= tooltipHeight + 40) {
-                // Position above the card with gap
-                tooltip.style.top = (rect.top - tooltipHeight - 30) + 'px';
+            if (spaceAbove >= tooltipHeight + gap + 20) {
+                // Position above the card with small gap
+                tooltip.style.top = (rect.top - tooltipHeight - gap) + 'px';
             } else {
-                // Position below the card with gap
-                tooltip.style.top = (rect.bottom + 30) + 'px';
+                // Position below the card with small gap
+                tooltip.style.top = (rect.bottom + gap) + 'px';
             }
             
             tooltip.style.left = (rect.left + rect.width / 2) + 'px';
