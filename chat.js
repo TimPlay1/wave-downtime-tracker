@@ -476,9 +476,21 @@ function displayMessage(data) {
             adminBadge = '<span class="admin-diamond">💎</span>';
         }
 
-        // Only mefisto can ban users (not other admins)
-        const canBan = isAdmin && currentUser && currentUser.nickname.toLowerCase() === 'mefisto';
-        const showBanButton = canBan && !isOwnMessage && !isMefisto;
+        // Ban button logic:
+        // - mefisto can ban everyone (except himself)
+        // - other admins can ban regular users only (not mefisto and not other admins)
+        const currentUserIsMefisto = currentUser && currentUser.nickname.toLowerCase() === 'mefisto';
+        let showBanButton = false;
+        
+        if (isAdmin && !isOwnMessage) {
+            if (currentUserIsMefisto) {
+                // mefisto can ban everyone
+                showBanButton = true;
+            } else {
+                // other admins can only ban non-admin users
+                showBanButton = !data.isAdmin;
+            }
+        }
 
         messageDiv.innerHTML = `
             ${avatarHTML}
