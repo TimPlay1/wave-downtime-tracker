@@ -468,11 +468,19 @@ function displayMessage(data) {
             messageContent = linkifyDowngrade(data.message);
         }
 
+        // Determine admin badge
+        let adminBadge = '';
+        if (isMefisto) {
+            adminBadge = '<span class="admin-crown">👑</span>';
+        } else if (data.isAdmin) {
+            adminBadge = '<span class="admin-diamond">💎</span>';
+        }
+
         messageDiv.innerHTML = `
             ${avatarHTML}
             <div class="message-content">
                 <div class="message-header">
-                    <span class="message-nickname">${escapeHtml(data.nickname)}${isMefisto ? '<span class="admin-crown">👑</span>' : ''}</span>
+                    <span class="message-nickname">${escapeHtml(data.nickname)}${adminBadge}</span>
                     <span class="message-time">${formatTime(data.timestamp)}</span>
                     ${isAdmin && !isOwnMessage ? `<button class="ban-button" onclick="banUser('${data.userId}', '${escapeHtml(data.nickname)}')">Ban</button>` : ''}
                 </div>
