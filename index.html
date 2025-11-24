@@ -235,8 +235,9 @@
             const tooltipWidth = 400 * 0.7;
             const tooltipHeight = 225 * 0.7;
             
-            // Position above the card
-            tooltip.style.top = (rect.top - tooltipHeight - 12) + 'px';
+            // Position above the card, ensuring it doesn't overlap the button
+            const topPosition = rect.top - tooltipHeight - 20;
+            tooltip.style.top = Math.max(20, topPosition) + 'px';
             tooltip.style.left = (rect.left + rect.width / 2) + 'px';
         }
         
