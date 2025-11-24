@@ -732,18 +732,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const stickerPicker = document.getElementById('stickerPicker');
     let isStickerPickerPinned = false;
     
-    function updateStickerPickerPosition() {
-        if (stickerBtn && stickerPicker) {
-            const btnRect = stickerBtn.getBoundingClientRect();
-            const pickerRect = stickerPicker.getBoundingClientRect();
-            const pickerWidth = pickerRect.width || 180;
-            const pickerHeight = pickerRect.height || 140;
-            
-            stickerPicker.style.top = (btnRect.top - pickerHeight - 12) + 'px';
-            stickerPicker.style.left = (btnRect.left + (btnRect.width / 2) - (pickerWidth / 2)) + 'px';
-        }
-    }
-    
     if (stickerBtn && stickerPicker) {
         // Click to toggle pinned state
         stickerBtn.addEventListener('click', (e) => {
@@ -751,7 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isStickerPickerPinned = !isStickerPickerPinned;
             
             if (isStickerPickerPinned) {
-                updateStickerPickerPosition();
                 stickerPicker.classList.add('visible');
                 stickerBtn.classList.add('active');
             } else {
@@ -763,7 +750,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hover to show (if not pinned)
         stickerBtn.addEventListener('mouseenter', () => {
             if (!isStickerPickerPinned) {
-                updateStickerPickerPosition();
                 stickerPicker.classList.add('visible');
             }
         });
@@ -781,19 +767,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stickerPicker.addEventListener('mouseleave', () => {
             if (!isStickerPickerPinned) {
                 stickerPicker.classList.remove('visible');
-            }
-        });
-        
-        // Update position on scroll/resize
-        window.addEventListener('scroll', () => {
-            if (stickerPicker.classList.contains('visible')) {
-                updateStickerPickerPosition();
-            }
-        });
-        
-        window.addEventListener('resize', () => {
-            if (stickerPicker.classList.contains('visible')) {
-                updateStickerPickerPosition();
             }
         });
         

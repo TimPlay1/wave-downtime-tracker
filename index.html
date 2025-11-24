@@ -119,11 +119,7 @@
                     <input type="text" id="messageInput" placeholder="Type a message..." maxlength="100">
                     <button class="sticker-btn" id="stickerBtn">
                         <img src="happy.png" alt="Stickers" class="sticker-btn-icon">
-                    </button>
-                    <button id="sendMessageBtn">Send</button>
-                    <div class="message-cooldown" id="messageCooldown"></div>
-                </div>
-                <div class="sticker-picker hidden" id="stickerPicker">
+                        <div class="sticker-picker hidden" id="stickerPicker">
                     <div class="sticker-item" data-sticker="happyemoji.webp">
                         <img src="happyemoji.webp" alt="Happy">
                     </div>
@@ -142,6 +138,10 @@
                     <div class="sticker-item" data-sticker="error.webp">
                         <img src="error.webp" alt="Error">
                     </div>
+                </div>
+                    </button>
+                    <button id="sendMessageBtn">Send</button>
+                    <div class="message-cooldown" id="messageCooldown"></div>
                 </div>
                 <div class="chat-error-message hidden" id="chatErrorMessage"></div>
             </div>
