@@ -673,6 +673,7 @@ body {
     margin: 48px 0 32px 0;
     flex-wrap: wrap;
     width: 100%;
+    overflow: visible;
 }
 
 .credit-card {
@@ -691,6 +692,7 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: inherit;
+    overflow: visible;
 }
 
 .credit-card:hover {
@@ -1606,10 +1608,6 @@ body {
     vertical-align: middle;
     margin-left: 12px;
     display: inline-block;
-}
-
-.wave-card {
-    position: relative;
 }
 
 .wave-card-tooltip {
