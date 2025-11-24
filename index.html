@@ -236,7 +236,18 @@
                     notificationPrompt.classList.remove('visible');
                     bellIcon.classList.remove('ringing');
                     isPromptActive = false;
-                }, 3000);
+                }, 2100); // 3000 - 30% = 2100ms
+            }
+        }
+        
+        function scheduleNextPrompt() {
+            if (!hasHoveredNotificationBtn && !notificationBtn.classList.contains('active')) {
+                // Random interval between 10 and 20 seconds
+                const randomInterval = Math.floor(Math.random() * (20000 - 10000 + 1)) + 10000;
+                promptInterval = setTimeout(() => {
+                    showNotificationPrompt();
+                    scheduleNextPrompt();
+                }, randomInterval);
             }
         }
         
@@ -256,17 +267,19 @@
         window.addEventListener('scroll', updatePromptPosition);
         window.addEventListener('resize', updatePromptPosition);
         
-        // Start showing prompts every 10 seconds
+        // Start showing prompts with randomized intervals
         if (!notificationBtn.classList.contains('active')) {
-            promptInterval = setInterval(showNotificationPrompt, 10000);
             // Show first prompt after 2 seconds
-            setTimeout(showNotificationPrompt, 2000);
+            setTimeout(() => {
+                showNotificationPrompt();
+                scheduleNextPrompt();
+            }, 2000);
         }
         
         notificationBtn.addEventListener('mouseenter', () => {
             if (!hasHoveredNotificationBtn) {
                 hasHoveredNotificationBtn = true;
-                clearInterval(promptInterval);
+                clearTimeout(promptInterval);
                 notificationPrompt.classList.remove('visible');
                 bellIcon.classList.remove('ringing');
                 isPromptActive = false;
