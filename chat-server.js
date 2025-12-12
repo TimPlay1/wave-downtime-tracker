@@ -1097,7 +1097,24 @@ app.get('/debug/user/:nickname', (req, res) => {
 
 app.post('/api/wave-cache', express.json(), async (req, res) => {
     try {
+        // Only allow from trusted sources (check for internal header or admin key)
+        const adminKey = req.body.adminKey || req.headers['x-admin-key'];
+        const internalKey = req.headers['x-internal-key'];
+        const ADMIN_KEY = process.env.ADMIN_KEY;
+        
+        // Allow if it's an internal request from the frontend (has specific origin) or has admin key
+        const origin = req.headers.origin || req.headers.referer || '';
+        const isTrustedOrigin = origin.includes('wavestatus.com') || 
+                               origin.includes('wave-downtime-tracker') ||
+                               origin.includes('localhost') ||
+                               origin.includes('127.0.0.1');
+        
+        if (!isTrustedOrigin && adminKey !== ADMIN_KEY) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+        
         const cacheData = req.body;
+        delete cacheData.adminKey; // Don't save admin key to database
         await saveWaveCache(cacheData);
         res.json({ success: true, message: 'Cache saved' });
     } catch (error) {
@@ -1124,8 +1141,9 @@ app.get('/api/wave-cache', async (req, res) => {
 app.post('/api/admin/override-timer', express.json(), async (req, res) => {
     const { adminKey, timerDurationMs, robloxUpdateCombo } = req.body;
     
-    // Security check
-    if (adminKey !== 'wave-admin-key-2025') {
+    // Security check using environment variable
+    const ADMIN_KEY = process.env.ADMIN_KEY;
+    if (!ADMIN_KEY || adminKey !== ADMIN_KEY) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     
@@ -1173,8 +1191,9 @@ app.post('/api/admin/override-timer', express.json(), async (req, res) => {
 app.post('/api/admin/update-user', express.json(), (req, res) => {
     const { oldNickname, newNickname, makeAdmin, customAvatar, adminKey } = req.body;
     
-    // Simple security check - you should replace this with proper authentication
-    if (adminKey !== 'wave-admin-key-2025') {
+    // Security check using environment variable
+    const ADMIN_KEY = process.env.ADMIN_KEY;
+    if (!ADMIN_KEY || adminKey !== ADMIN_KEY) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     
