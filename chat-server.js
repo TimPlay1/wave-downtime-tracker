@@ -1120,6 +1120,55 @@ app.get('/api/wave-cache', async (req, res) => {
     }
 });
 
+// Admin endpoint to manually override timer during downtime
+app.post('/api/admin/override-timer', express.json(), async (req, res) => {
+    const { adminKey, timerDurationMs, robloxUpdateCombo } = req.body;
+    
+    // Security check
+    if (adminKey !== 'wave-admin-key-2025') {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+        const cache = await loadWaveCache();
+        if (!cache) {
+            return res.status(404).json({ error: 'No cache available' });
+        }
+        
+        if (!cache.isDown) {
+            return res.status(400).json({ error: 'Wave is not down, cannot override timer' });
+        }
+        
+        const updates = {};
+        
+        // Calculate new apiDownSince based on desired duration
+        if (timerDurationMs !== undefined && timerDurationMs > 0) {
+            updates.manualApiDownSince = Date.now() - timerDurationMs;
+            updates.manualTimerOverride = true;
+        }
+        
+        // Update combo if provided
+        if (robloxUpdateCombo !== undefined && robloxUpdateCombo >= 1) {
+            updates.robloxUpdateCombo = robloxUpdateCombo;
+        }
+        
+        if (Object.keys(updates).length > 0) {
+            await db.collection('waveCache').updateOne(
+                { _id: 'current' },
+                { $set: { ...updates, lastUpdated: Date.now() } }
+            );
+            
+            console.log('⚙️ Timer manually overridden:', updates);
+            res.json({ success: true, message: 'Timer overridden', updates });
+        } else {
+            res.status(400).json({ error: 'No valid parameters provided' });
+        }
+    } catch (error) {
+        console.error('Error overriding timer:', error);
+        res.status(500).json({ error: 'Failed to override timer' });
+    }
+});
+
 // Admin endpoint to update user
 app.post('/api/admin/update-user', express.json(), (req, res) => {
     const { oldNickname, newNickname, makeAdmin, customAvatar, adminKey } = req.body;

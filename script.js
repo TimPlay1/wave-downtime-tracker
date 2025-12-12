@@ -58,7 +58,10 @@ async function loadSavedData() {
             if (dbCache.isDown !== undefined) {
                 currentState.isDown = dbCache.isDown;
             }
-            if (dbCache.apiDownSince) {
+            // Use manualApiDownSince if it's set (admin override), otherwise use apiDownSince
+            if (dbCache.manualTimerOverride && dbCache.manualApiDownSince) {
+                currentState.apiDownSince = dbCache.manualApiDownSince;
+            } else if (dbCache.apiDownSince) {
                 currentState.apiDownSince = dbCache.apiDownSince;
             }
             if (dbCache.robloxVersionAtDownStart) {
@@ -154,7 +157,10 @@ async function saveData() {
             longestDowntimeDate: currentState.longestDowntimeDate,
             lastRobloxCombo: currentState.lastRobloxCombo,
             longestRobloxCombo: currentState.longestRobloxCombo,
-            robloxUpdateCombo: currentState.robloxUpdateCombo
+            robloxUpdateCombo: currentState.robloxUpdateCombo,
+            // Reset manual override when Wave is up
+            manualTimerOverride: currentState.isDown ? undefined : false,
+            manualApiDownSince: currentState.isDown ? undefined : null
         };
         
         localStorage.setItem('previousRobloxVersion', currentState.previousRobloxVersion);
