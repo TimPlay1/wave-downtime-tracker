@@ -599,6 +599,175 @@ body {
     text-shadow: 0 2px 10px rgba(147, 197, 253, 0.5);
 }
 
+/* Roblox Update Combo Styles */
+.roblox-combo-container {
+    margin-top: 20px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: rgba(147, 197, 253, 0.1);
+    border: 1px solid rgba(147, 197, 253, 0.3);
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.roblox-combo-container.hidden {
+    display: none;
+}
+
+.combo-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: rgb(147, 197, 253);
+}
+
+.combo-roblox-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 10px rgba(147, 197, 253, 0.4));
+}
+
+.combo-label {
+    font-weight: 500;
+}
+
+.combo-count {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+/* Combo Level 1 (x2) - Subtle */
+.combo-level-1 {
+    background: rgba(147, 197, 253, 0.15);
+    border-color: rgba(147, 197, 253, 0.4);
+}
+
+.combo-level-1 .combo-count {
+    color: rgb(147, 197, 253);
+}
+
+/* Combo Level 2 (x3) - Warning */
+.combo-level-2 {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.5);
+    animation: comboGlow2 2s ease-in-out infinite;
+}
+
+.combo-level-2 .combo-text {
+    color: rgb(251, 191, 36);
+}
+
+.combo-level-2 .combo-count {
+    color: rgb(251, 191, 36);
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+/* Combo Level 3 (x4) - Danger */
+.combo-level-3 {
+    background: rgba(249, 115, 22, 0.2);
+    border-color: rgba(249, 115, 22, 0.6);
+    animation: comboGlow3 1.5s ease-in-out infinite;
+}
+
+.combo-level-3 .combo-text {
+    color: rgb(249, 115, 22);
+}
+
+.combo-level-3 .combo-count {
+    color: rgb(249, 115, 22);
+    font-size: 28px;
+    text-shadow: 0 0 15px rgba(249, 115, 22, 0.7);
+}
+
+.combo-level-3 .combo-roblox-icon {
+    animation: spinIcon 1s linear infinite;
+}
+
+/* Combo Level 4 (x5+) - EPIC */
+.combo-level-4 {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(168, 85, 247, 0.25));
+    border-color: rgb(239, 68, 68);
+    animation: comboGlow4 1s ease-in-out infinite, comboPulse 0.5s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(168, 85, 247, 0.3);
+}
+
+.combo-level-4 .combo-text {
+    color: rgb(239, 68, 68);
+}
+
+.combo-level-4 .combo-count {
+    color: rgb(239, 68, 68);
+    font-size: 32px;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(168, 85, 247, 0.6);
+    animation: textPulse 0.5s ease-in-out infinite;
+}
+
+.combo-level-4 .combo-roblox-icon {
+    animation: spinIcon 0.5s linear infinite;
+    width: 32px;
+    height: 32px;
+}
+
+.combo-level-4 .combo-label {
+    animation: textShake 0.3s ease-in-out infinite;
+}
+
+/* Combo Animations */
+@keyframes comboGlow2 {
+    0%, 100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
+}
+
+@keyframes comboGlow3 {
+    0%, 100% { box-shadow: 0 0 10px rgba(249, 115, 22, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.7); }
+}
+
+@keyframes comboGlow4 {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(168, 85, 247, 0.3);
+        border-color: rgb(239, 68, 68);
+    }
+    50% { 
+        box-shadow: 0 0 35px rgba(239, 68, 68, 0.7), 0 0 60px rgba(168, 85, 247, 0.5);
+        border-color: rgb(168, 85, 247);
+    }
+}
+
+@keyframes comboPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes spinIcon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes textShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-1px); }
+    75% { transform: translateX(1px); }
+}
+
+@keyframes comboBump {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.combo-bump {
+    animation: comboBump 0.3s ease-out;
+}
+
 .api-status-section {
     margin-top: 32px;
     text-align: center;
@@ -663,6 +832,41 @@ body {
     font-weight: 700;
     font-family: 'Courier New', monospace;
     color: rgb(251, 191, 36);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-duration {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.stat-date {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(147, 197, 253, 0.7);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.stat-combo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(147, 197, 253);
+    margin-top: 4px;
+}
+
+.stat-combo-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 8px rgba(147, 197, 253, 0.35));
 }
 
 .credits-section {

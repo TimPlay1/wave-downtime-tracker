@@ -1,13 +1,5 @@
 const https = require('https');
 
-const data = JSON.stringify({
-    oldNickname: 'hidden',
-    newNickname: 'Hidden',
-    makeAdmin: true,
-    customAvatar: 'hidden.png',
-    adminKey: 'wave-admin-key-2025'
-});
-
 const options = {
     hostname: 'wave-chat-server.onrender.com',
     port: 443,
@@ -15,15 +7,19 @@ const options = {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
-        'Content-Length': data.length
     }
 };
 
+const data = JSON.stringify({
+    oldNickname: 'Hidden',
+    newNickname: 'Hidden',
+    adminKey: 'wave-admin-key-2025'
+});
+
 const req = https.request(options, (res) => {
-    let responseData = '';
-    
     console.log(`Status Code: ${res.statusCode}`);
     
+    let responseData = '';
     res.on('data', (chunk) => {
         responseData += chunk;
     });
@@ -32,22 +28,21 @@ const req = https.request(options, (res) => {
         console.log('Response:', responseData);
         try {
             const parsed = JSON.parse(responseData);
-            if (parsed.success) {
-                console.log('\n✅ User updated successfully!');
-                console.log('New nickname:', parsed.user.nickname);
+            if (parsed.user) {
+                console.log('\n✅ Current user data:');
+                console.log('Nickname:', parsed.user.nickname);
                 console.log('Admin status:', parsed.user.isAdmin);
                 console.log('Custom avatar:', parsed.user.customAvatar);
-            } else {
-                console.log('\n❌ Update failed:', parsed.error);
+                console.log('User ID:', parsed.user.id);
             }
         } catch (e) {
-            console.log('Raw response:', responseData);
+            console.error('Failed to parse response');
         }
     });
 });
 
 req.on('error', (error) => {
-    console.error('❌ Error:', error.message);
+    console.error('Error:', error);
 });
 
 req.write(data);

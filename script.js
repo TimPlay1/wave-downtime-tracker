@@ -21,7 +21,13 @@ let currentState = {
     longestDowntime: 0,
     savedLastDowntime: 0,
     apiAvailable: true,
-    previousRobloxVersion: 'version-e380c8edc8f6477c'
+    previousRobloxVersion: 'version-e380c8edc8f6477c',
+    robloxVersionAtDownStart: null,
+    lastDowntimeDate: null,
+    longestDowntimeDate: null,
+    robloxUpdateCombo: 0,
+    lastRobloxCombo: 0,
+    longestRobloxCombo: 0
 };
 
 let notificationsEnabled = false;
@@ -55,6 +61,24 @@ async function loadSavedData() {
             if (dbCache.apiDownSince) {
                 currentState.apiDownSince = dbCache.apiDownSince;
             }
+            if (dbCache.robloxVersionAtDownStart) {
+                currentState.robloxVersionAtDownStart = dbCache.robloxVersionAtDownStart;
+            }
+            if (dbCache.lastDowntimeDate) {
+                currentState.lastDowntimeDate = dbCache.lastDowntimeDate;
+            }
+            if (dbCache.longestDowntimeDate) {
+                currentState.longestDowntimeDate = dbCache.longestDowntimeDate;
+            }
+            if (dbCache.lastRobloxCombo) {
+                currentState.lastRobloxCombo = dbCache.lastRobloxCombo;
+            }
+            if (dbCache.longestRobloxCombo) {
+                currentState.longestRobloxCombo = dbCache.longestRobloxCombo;
+            }
+            if (dbCache.robloxUpdateCombo) {
+                currentState.robloxUpdateCombo = dbCache.robloxUpdateCombo;
+            }
         } else {
 
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -84,6 +108,24 @@ async function loadSavedData() {
                 if (data.previousRobloxVersion) {
                     currentState.previousRobloxVersion = data.previousRobloxVersion;
                 }
+                if (data.robloxVersionAtDownStart) {
+                    currentState.robloxVersionAtDownStart = data.robloxVersionAtDownStart;
+                }
+                if (data.lastDowntimeDate) {
+                    currentState.lastDowntimeDate = data.lastDowntimeDate;
+                }
+                if (data.longestDowntimeDate) {
+                    currentState.longestDowntimeDate = data.longestDowntimeDate;
+                }
+                if (data.lastRobloxCombo) {
+                    currentState.lastRobloxCombo = data.lastRobloxCombo;
+                }
+                if (data.longestRobloxCombo) {
+                    currentState.longestRobloxCombo = data.longestRobloxCombo;
+                }
+                if (data.robloxUpdateCombo) {
+                    currentState.robloxUpdateCombo = data.robloxUpdateCombo;
+                }
             }
         }
         
@@ -106,7 +148,13 @@ async function saveData() {
             lastKnownVersion: currentState.lastKnownVersion,
             isDown: currentState.isDown,
             apiDownSince: currentState.apiDownSince,
-            previousRobloxVersion: currentState.previousRobloxVersion
+            previousRobloxVersion: currentState.previousRobloxVersion,
+            robloxVersionAtDownStart: currentState.robloxVersionAtDownStart,
+            lastDowntimeDate: currentState.lastDowntimeDate,
+            longestDowntimeDate: currentState.longestDowntimeDate,
+            lastRobloxCombo: currentState.lastRobloxCombo,
+            longestRobloxCombo: currentState.longestRobloxCombo,
+            robloxUpdateCombo: currentState.robloxUpdateCombo
         };
         
         localStorage.setItem('previousRobloxVersion', currentState.previousRobloxVersion);
@@ -247,29 +295,148 @@ function updateTimer() {
         const elapsed = Date.now() - currentState.apiDownSince;
         timerElement.textContent = formatTimer(elapsed);
 
+        // Only update longest downtime value, don't re-render stats
         if (elapsed > currentState.longestDowntime) {
             currentState.longestDowntime = elapsed;
+            // Only update the duration text, not the whole HTML
+            const recordDuration = document.querySelector('#record .stat-duration');
+            if (recordDuration) {
+                recordDuration.textContent = formatDuration(elapsed);
+            }
         }
-
-        updateStatsDisplay();
     }
+}
+
+function formatDate(timestamp) {
+    if (!timestamp) return null;
+    const date = new Date(timestamp);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+function formatCombo(combo) {
+    if (!combo || combo <= 1) return '';
+    return `<img src="Roblox.webp" alt="Roblox" class="stat-combo-icon">x${combo}`;
 }
 
 function updateStatsDisplay() {
     const lastDowntimeElement = document.getElementById('lastDowntime');
     const recordElement = document.getElementById('record');
 
-    if (currentState.savedLastDowntime > 0) {
-        lastDowntimeElement.textContent = formatDuration(currentState.savedLastDowntime);
-    } else {
-        lastDowntimeElement.textContent = 'No data yet';
+    // Check if last downtime data changed
+    const lastChanged = lastRenderedStats.savedLastDowntime !== currentState.savedLastDowntime ||
+                       lastRenderedStats.lastDowntimeDate !== currentState.lastDowntimeDate ||
+                       lastRenderedStats.lastRobloxCombo !== currentState.lastRobloxCombo;
+
+    if (lastChanged) {
+        if (currentState.savedLastDowntime > 0) {
+            let html = `<span class="stat-duration">${formatDuration(currentState.savedLastDowntime)}</span>`;
+            if (currentState.lastDowntimeDate) {
+                html += `<span class="stat-date">${formatDate(currentState.lastDowntimeDate)}</span>`;
+            }
+            if (currentState.lastRobloxCombo > 1) {
+                html += `<span class="stat-combo">${formatCombo(currentState.lastRobloxCombo)}</span>`;
+            }
+            lastDowntimeElement.innerHTML = html;
+        } else {
+            lastDowntimeElement.textContent = 'No data yet';
+        }
+        lastRenderedStats.savedLastDowntime = currentState.savedLastDowntime;
+        lastRenderedStats.lastDowntimeDate = currentState.lastDowntimeDate;
+        lastRenderedStats.lastRobloxCombo = currentState.lastRobloxCombo;
     }
 
-    if (currentState.longestDowntime > 0) {
-        recordElement.textContent = formatDuration(currentState.longestDowntime);
-    } else {
-        recordElement.textContent = 'No data yet';
+    // Check if longest downtime data changed (excluding live duration updates)
+    const longestChanged = lastRenderedStats.longestDowntimeDate !== currentState.longestDowntimeDate ||
+                          lastRenderedStats.longestRobloxCombo !== currentState.longestRobloxCombo ||
+                          (lastRenderedStats.longestDowntime === null && currentState.longestDowntime > 0);
+
+    if (longestChanged) {
+        if (currentState.longestDowntime > 0) {
+            let html = `<span class="stat-duration">${formatDuration(currentState.longestDowntime)}</span>`;
+            if (currentState.longestDowntimeDate) {
+                html += `<span class="stat-date">${formatDate(currentState.longestDowntimeDate)}</span>`;
+            }
+            if (currentState.longestRobloxCombo > 1) {
+                html += `<span class="stat-combo">${formatCombo(currentState.longestRobloxCombo)}</span>`;
+            }
+            recordElement.innerHTML = html;
+        } else {
+            recordElement.textContent = 'No data yet';
+        }
+        lastRenderedStats.longestDowntime = currentState.longestDowntime;
+        lastRenderedStats.longestDowntimeDate = currentState.longestDowntimeDate;
+        lastRenderedStats.longestRobloxCombo = currentState.longestRobloxCombo;
     }
+    
+    // Update combo display under timer
+    updateComboDisplay();
+}
+
+function getComboLevel(combo) {
+    if (combo <= 1) return 0;
+    if (combo === 2) return 1;
+    if (combo === 3) return 2;
+    if (combo === 4) return 3;
+    if (combo >= 5) return 4;
+    return 0;
+}
+
+// Cache for preventing unnecessary re-renders
+let lastRenderedStats = {
+    savedLastDowntime: null,
+    lastDowntimeDate: null,
+    lastRobloxCombo: null,
+    longestDowntime: null,
+    longestDowntimeDate: null,
+    longestRobloxCombo: null,
+    robloxUpdateCombo: null
+};
+
+function updateComboDisplay() {
+    let comboContainer = document.getElementById('robloxComboContainer');
+    
+    // Create container if it doesn't exist
+    if (!comboContainer) {
+        const timerSection = document.getElementById('timerSection');
+        if (timerSection) {
+            comboContainer = document.createElement('div');
+            comboContainer.id = 'robloxComboContainer';
+            comboContainer.className = 'roblox-combo-container';
+            timerSection.appendChild(comboContainer);
+        }
+    }
+    
+    if (!comboContainer) return;
+    
+    const combo = currentState.robloxUpdateCombo;
+    
+    if (combo <= 1 || !currentState.isDown) {
+        comboContainer.classList.add('hidden');
+        lastRenderedStats.robloxUpdateCombo = null;
+        return;
+    }
+    
+    // Only update if combo changed
+    if (lastRenderedStats.robloxUpdateCombo === combo) {
+        return;
+    }
+    lastRenderedStats.robloxUpdateCombo = combo;
+    
+    comboContainer.classList.remove('hidden');
+    
+    const level = getComboLevel(combo);
+    comboContainer.className = 'roblox-combo-container combo-level-' + level;
+    
+    comboContainer.innerHTML = `
+        <div class="combo-text">
+            <img src="Roblox.webp" alt="Roblox" class="combo-roblox-icon">
+            <span class="combo-label">Roblox Updated</span>
+            <span class="combo-count">x${combo}</span>
+        </div>
+    `;
 }
 
 async function updateUI(data) {
@@ -361,11 +528,18 @@ async function updateUI(data) {
         if (wasUpdated && currentState.isDown) {
 
             const finalDowntime = currentState.apiDownSince ? Date.now() - currentState.apiDownSince : 0;
+            const nowTimestamp = Date.now();
+            const finalCombo = currentState.robloxUpdateCombo || 1;
 
             currentState.lastDowntimeDuration = finalDowntime;
+            currentState.savedLastDowntime = finalDowntime;
+            currentState.lastDowntimeDate = nowTimestamp;
+            currentState.lastRobloxCombo = finalCombo;
 
             if (finalDowntime > currentState.longestDowntime) {
                 currentState.longestDowntime = finalDowntime;
+                currentState.longestDowntimeDate = nowTimestamp;
+                currentState.longestRobloxCombo = finalCombo;
             }
 
             await saveData();
@@ -377,36 +551,73 @@ async function updateUI(data) {
     const isCurrentlyDown = data.updateStatus === false;
 
     const robloxData = await fetchRobloxVersion();
-    if (robloxData && robloxData.WindowsDate) {
-        const robloxTimestamp = parseApiDate(robloxData.WindowsDate);
-        if (robloxTimestamp) {
-
-            if (!currentState.apiDownSince || currentState.apiDownSince !== robloxTimestamp) {
+    const currentRobloxVersion = robloxData && robloxData.Windows ? robloxData.Windows : null;
+    
+    if (isCurrentlyDown && !currentState.isDown) {
+        // Wave just went down - save the Roblox version at the start of downtime
+        if (currentRobloxVersion) {
+            currentState.robloxVersionAtDownStart = currentRobloxVersion;
+            currentState.previousRobloxVersion = currentRobloxVersion;
+            localStorage.setItem('previousRobloxVersion', currentRobloxVersion);
+        }
+        
+        // Set apiDownSince to now (start of this downtime)
+        if (robloxData && robloxData.WindowsDate) {
+            const robloxTimestamp = parseApiDate(robloxData.WindowsDate);
+            if (robloxTimestamp) {
                 currentState.apiDownSince = robloxTimestamp;
             }
+        } else {
+            currentState.apiDownSince = Date.now();
         }
-    }
-
-    if (isCurrentlyDown && !currentState.isDown) {
-        // Save current Roblox version as previous before going down
-        if (robloxData && robloxData.Windows) {
-            currentState.previousRobloxVersion = robloxData.Windows;
-            localStorage.setItem('previousRobloxVersion', robloxData.Windows);
-        }
+        
+        // Reset combo counter for new downtime
+        currentState.robloxUpdateCombo = 1;
         
         currentState.isDown = true;
         currentState.downSince = Date.now();
         currentState.version = data.version;
+        await saveData();
+    } else if (isCurrentlyDown && currentState.isDown) {
+        // Wave is still down - check if Roblox updated again
+        // Only reset timer if Roblox version changed AND Wave hasn't updated yet
+        if (currentRobloxVersion && currentState.robloxVersionAtDownStart && 
+            currentRobloxVersion !== currentState.robloxVersionAtDownStart) {
+            // Roblox updated while Wave was still down - INCREMENT COMBO!
+            currentState.robloxUpdateCombo = (currentState.robloxUpdateCombo || 1) + 1;
+            
+            // Update the start time to the new Roblox update time
+            if (robloxData && robloxData.WindowsDate) {
+                const robloxTimestamp = parseApiDate(robloxData.WindowsDate);
+                if (robloxTimestamp) {
+                    currentState.apiDownSince = robloxTimestamp;
+                }
+            }
+            currentState.robloxVersionAtDownStart = currentRobloxVersion;
+            currentState.previousRobloxVersion = currentRobloxVersion;
+            localStorage.setItem('previousRobloxVersion', currentRobloxVersion);
+            
+            // Update combo display with animation
+            updateComboDisplay();
+            
+            await saveData();
+        }
     } else if (!isCurrentlyDown && currentState.isDown) {
 
         const finalDowntime = currentState.apiDownSince ? Date.now() - currentState.apiDownSince : 0;
+        const nowTimestamp = Date.now();
+        const finalCombo = currentState.robloxUpdateCombo || 1;
 
         if (finalDowntime > 0) {
 
             currentState.savedLastDowntime = finalDowntime;
+            currentState.lastDowntimeDate = nowTimestamp;
+            currentState.lastRobloxCombo = finalCombo;
 
             if (finalDowntime > currentState.longestDowntime) {
                 currentState.longestDowntime = finalDowntime;
+                currentState.longestDowntimeDate = nowTimestamp;
+                currentState.longestRobloxCombo = finalCombo;
             }
 
             currentState.lastDowntimeDuration = finalDowntime;
@@ -417,6 +628,8 @@ async function updateUI(data) {
         currentState.isDown = false;
         currentState.downSince = null;
         currentState.apiDownSince = null;
+        currentState.robloxVersionAtDownStart = null;
+        currentState.robloxUpdateCombo = 0;
         await saveData();
         updateStatsDisplay();
     }
@@ -436,6 +649,7 @@ async function updateUI(data) {
             buttonEl.style.display = 'block';
         }
         updateTimer();
+        updateComboDisplay();
     } else {
         statusTextElement.innerHTML = 'WAVE IS UP! <img src="happyemoji.webp" alt="Happy" class="status-emoji">';
         statusTextElement.className = 'status-text status-up';
@@ -454,6 +668,12 @@ async function updateUI(data) {
             timerLabelElement.textContent = 'Last downtime duration';
         } else {
             timerSectionElement.classList.add('hidden');
+        }
+        
+        // Hide combo when Wave is up
+        const comboContainer = document.getElementById('robloxComboContainer');
+        if (comboContainer) {
+            comboContainer.classList.add('hidden');
         }
     }
 }
