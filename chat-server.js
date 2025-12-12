@@ -173,9 +173,44 @@ async function saveData() {
     }
 }
 
-async function saveWaveCache(cacheData) {
+async function saveWaveCache(cacheData, isAdminRequest = false) {
     try {
         if (db) {
+            // Get current cache to check for protected fields
+            const currentCache = await db.collection('waveCache').findOne({ _id: 'current' });
+            
+            // If not admin request, protect certain fields from being overwritten with old/invalid data
+            if (!isAdminRequest && currentCache) {
+                // Don't let clients overwrite manual timer override
+                if (currentCache.manualTimerOverride) {
+                    delete cacheData.manualTimerOverride;
+                    delete cacheData.manualApiDownSince;
+                }
+                
+                // Don't let clients overwrite combo if server has correct value
+                if (currentCache.robloxUpdateCombo !== undefined && cacheData.robloxUpdateCombo !== undefined) {
+                    // Only allow increase, not decrease (unless going to 0 when Wave is up)
+                    if (cacheData.robloxUpdateCombo < currentCache.robloxUpdateCombo && cacheData.isDown !== false) {
+                        delete cacheData.robloxUpdateCombo;
+                    }
+                }
+                
+                // Don't let clients set lastRobloxCombo/longestRobloxCombo to non-zero if server has 0
+                // (prevents old localStorage from polluting new tracking)
+                if (currentCache.lastRobloxCombo === 0 && cacheData.lastRobloxCombo > 0) {
+                    delete cacheData.lastRobloxCombo;
+                }
+                if (currentCache.longestRobloxCombo === 0 && cacheData.longestRobloxCombo > 0) {
+                    delete cacheData.longestRobloxCombo;
+                }
+                if (currentCache.lastDowntimeDate === null && cacheData.lastDowntimeDate) {
+                    delete cacheData.lastDowntimeDate;
+                }
+                if (currentCache.longestDowntimeDate === null && cacheData.longestDowntimeDate) {
+                    delete cacheData.longestDowntimeDate;
+                }
+            }
+            
             await db.collection('waveCache').updateOne(
                 { _id: 'current' },
                 {
@@ -1102,6 +1137,9 @@ app.post('/api/wave-cache', express.json(), async (req, res) => {
         const internalKey = req.headers['x-internal-key'];
         const ADMIN_KEY = process.env.ADMIN_KEY;
         
+        // Check if this is an admin request
+        const isAdminRequest = adminKey === ADMIN_KEY;
+        
         // Allow if it's an internal request from the frontend (has specific origin) or has admin key
         const origin = req.headers.origin || req.headers.referer || '';
         const isTrustedOrigin = origin.includes('wavestatus.com') || 
@@ -1109,13 +1147,13 @@ app.post('/api/wave-cache', express.json(), async (req, res) => {
                                origin.includes('localhost') ||
                                origin.includes('127.0.0.1');
         
-        if (!isTrustedOrigin && adminKey !== ADMIN_KEY) {
+        if (!isTrustedOrigin && !isAdminRequest) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
         
         const cacheData = req.body;
         delete cacheData.adminKey; // Don't save admin key to database
-        await saveWaveCache(cacheData);
+        await saveWaveCache(cacheData, isAdminRequest);
         res.json({ success: true, message: 'Cache saved' });
     } catch (error) {
         console.error('Error saving cache:', error);
