@@ -1177,7 +1177,7 @@ app.get('/api/wave-cache', async (req, res) => {
 
 // Admin endpoint to manually override timer during downtime
 app.post('/api/admin/override-timer', express.json(), async (req, res) => {
-    const { adminKey, timerDurationMs, robloxUpdateCombo } = req.body;
+    const { adminKey, timerDurationMs, robloxUpdateCombo, robloxVersionAtDownStart, previousRobloxVersion } = req.body;
     
     // Security check using environment variable
     const ADMIN_KEY = process.env.ADMIN_KEY;
@@ -1206,6 +1206,16 @@ app.post('/api/admin/override-timer', express.json(), async (req, res) => {
         // Update combo if provided
         if (robloxUpdateCombo !== undefined && robloxUpdateCombo >= 1) {
             updates.robloxUpdateCombo = robloxUpdateCombo;
+        }
+        
+        // Update robloxVersionAtDownStart if provided
+        if (robloxVersionAtDownStart) {
+            updates.robloxVersionAtDownStart = robloxVersionAtDownStart;
+        }
+        
+        // Update previousRobloxVersion if provided
+        if (previousRobloxVersion) {
+            updates.previousRobloxVersion = previousRobloxVersion;
         }
         
         if (Object.keys(updates).length > 0) {

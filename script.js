@@ -586,9 +586,11 @@ async function updateUI(data) {
         await saveData();
     } else if (isCurrentlyDown && currentState.isDown) {
         // Wave is still down - check if Roblox updated again
-        // Only reset timer if Roblox version changed AND Wave hasn't updated yet
-        if (currentRobloxVersion && currentState.robloxVersionAtDownStart && 
-            currentRobloxVersion !== currentState.robloxVersionAtDownStart) {
+        // Use robloxVersionAtDownStart if available, otherwise fall back to previousRobloxVersion
+        const versionToCompare = currentState.robloxVersionAtDownStart || currentState.previousRobloxVersion;
+        
+        if (currentRobloxVersion && versionToCompare && 
+            currentRobloxVersion !== versionToCompare) {
             // Roblox updated while Wave was still down - INCREMENT COMBO!
             currentState.robloxUpdateCombo = (currentState.robloxUpdateCombo || 1) + 1;
             
