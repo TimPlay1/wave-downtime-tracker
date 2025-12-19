@@ -187,10 +187,11 @@ async function saveWaveCache(cacheData, isAdminRequest = false) {
                     delete cacheData.manualApiDownSince;
                 }
                 
-                // NEVER let clients change combo - only admin can set it
+                // NEVER let clients change combo - only admin/server can set it
                 delete cacheData.robloxUpdateCombo;
                 delete cacheData.lastRobloxCombo;
                 delete cacheData.longestRobloxCombo;
+                delete cacheData.comboLocked; // Never let clients change the lock status
                 
                 // Don't let clients overwrite certain dates
                 if (currentCache.lastDowntimeDate === null && cacheData.lastDowntimeDate) {
@@ -343,6 +344,9 @@ async function checkWaveAndRobloxStatus() {
         const savedRobloxVersion = cache?.robloxVersionAtDownStart || null;
         let currentCombo = cache?.robloxUpdateCombo || 0;
         
+        // Check if combo is locked by admin
+        const isComboLocked = cache?.comboLocked === true;
+        
         // Wave just went DOWN
         if (isWaveDown && !wasDown) {
             console.log('🔴 Wave went DOWN - resetting combo to 1');
@@ -353,6 +357,7 @@ async function checkWaveAndRobloxStatus() {
                         isDown: true,
                         robloxUpdateCombo: 1,
                         robloxVersionAtDownStart: currentRobloxVersion,
+                        comboLocked: false, // Reset lock when Wave goes down
                         lastUpdated: Date.now()
                     } 
                 },
@@ -362,26 +367,32 @@ async function checkWaveAndRobloxStatus() {
         }
         // Wave is still DOWN - check for Roblox updates
         else if (isWaveDown && wasDown) {
-            const versionToCompare = savedRobloxVersion || lastKnownRobloxVersion;
-            
-            if (currentRobloxVersion && versionToCompare && 
-                currentRobloxVersion !== versionToCompare) {
-                // Roblox updated while Wave is down - INCREMENT COMBO!
-                const newCombo = (currentCombo || 1) + 1;
-                console.log(`🎮 Roblox updated while Wave down! Combo: ${currentCombo} → ${newCombo}`);
-                console.log(`   Version change: ${versionToCompare} → ${currentRobloxVersion}`);
-                
-                await db.collection('waveCache').updateOne(
-                    { _id: 'current' },
-                    { 
-                        $set: { 
-                            robloxUpdateCombo: newCombo,
-                            robloxVersionAtDownStart: currentRobloxVersion,
-                            lastUpdated: Date.now()
-                        } 
-                    }
-                );
+            // Skip combo increment if locked by admin
+            if (isComboLocked) {
+                console.log('🔒 Combo is locked by admin, skipping automatic increment');
                 lastKnownRobloxVersion = currentRobloxVersion;
+            } else {
+                const versionToCompare = savedRobloxVersion || lastKnownRobloxVersion;
+                
+                if (currentRobloxVersion && versionToCompare && 
+                    currentRobloxVersion !== versionToCompare) {
+                    // Roblox updated while Wave is down - INCREMENT COMBO!
+                    const newCombo = (currentCombo || 1) + 1;
+                    console.log(`🎮 Roblox updated while Wave down! Combo: ${currentCombo} → ${newCombo}`);
+                    console.log(`   Version change: ${versionToCompare} → ${currentRobloxVersion}`);
+                    
+                    await db.collection('waveCache').updateOne(
+                        { _id: 'current' },
+                        { 
+                            $set: { 
+                                robloxUpdateCombo: newCombo,
+                                robloxVersionAtDownStart: currentRobloxVersion,
+                                lastUpdated: Date.now()
+                            } 
+                        }
+                    );
+                    lastKnownRobloxVersion = currentRobloxVersion;
+                }
             }
         }
         // Wave just went UP
@@ -397,6 +408,7 @@ async function checkWaveAndRobloxStatus() {
                         lastRobloxCombo: finalCombo,
                         robloxUpdateCombo: 0,
                         robloxVersionAtDownStart: null,
+                        comboLocked: false, // Reset lock when Wave is back up
                         lastUpdated: Date.now()
                     } 
                 }
@@ -1303,9 +1315,11 @@ app.post('/api/admin/override-timer', express.json(), async (req, res) => {
             updates.manualTimerOverride = true;
         }
         
-        // Update combo if provided
+        // Update combo if provided and LOCK it so server monitoring doesn't change it
         if (robloxUpdateCombo !== undefined && robloxUpdateCombo >= 1) {
             updates.robloxUpdateCombo = robloxUpdateCombo;
+            updates.comboLocked = true; // Lock combo so auto-monitoring doesn't change it
+            console.log(`🔒 Admin locked combo to ${robloxUpdateCombo}`);
         }
         
         // Update robloxVersionAtDownStart if provided
