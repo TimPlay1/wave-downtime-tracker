@@ -155,9 +155,10 @@ async function saveData() {
             robloxVersionAtDownStart: currentState.robloxVersionAtDownStart,
             lastDowntimeDate: currentState.lastDowntimeDate,
             longestDowntimeDate: currentState.longestDowntimeDate,
-            lastRobloxCombo: currentState.lastRobloxCombo,
-            longestRobloxCombo: currentState.longestRobloxCombo,
-            robloxUpdateCombo: currentState.robloxUpdateCombo,
+            // DON'T send combo fields - they are managed by server/admin only
+            // lastRobloxCombo: currentState.lastRobloxCombo,
+            // longestRobloxCombo: currentState.longestRobloxCombo,
+            // robloxUpdateCombo: currentState.robloxUpdateCombo,
             // Reset manual override when Wave is up
             manualTimerOverride: currentState.isDown ? undefined : false,
             manualApiDownSince: currentState.isDown ? undefined : null
@@ -577,8 +578,8 @@ async function updateUI(data) {
             currentState.apiDownSince = Date.now();
         }
         
-        // Reset combo counter for new downtime
-        currentState.robloxUpdateCombo = 1;
+        // DON'T reset combo here - combo is managed by server/admin only
+        // currentState.robloxUpdateCombo = 1;
         
         currentState.isDown = true;
         currentState.downSince = Date.now();
@@ -591,8 +592,9 @@ async function updateUI(data) {
         
         if (currentRobloxVersion && versionToCompare && 
             currentRobloxVersion !== versionToCompare) {
-            // Roblox updated while Wave was still down - INCREMENT COMBO!
-            currentState.robloxUpdateCombo = (currentState.robloxUpdateCombo || 1) + 1;
+            // Roblox updated while Wave was still down
+            // DON'T increment combo here - combo is managed by server/admin only
+            // Just update local version tracking
             
             // Update the start time to the new Roblox update time
             if (robloxData && robloxData.WindowsDate) {
