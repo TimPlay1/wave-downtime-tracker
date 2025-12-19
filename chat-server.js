@@ -187,22 +187,12 @@ async function saveWaveCache(cacheData, isAdminRequest = false) {
                     delete cacheData.manualApiDownSince;
                 }
                 
-                // Don't let clients overwrite combo if server has correct value
-                if (currentCache.robloxUpdateCombo !== undefined && cacheData.robloxUpdateCombo !== undefined) {
-                    // Only allow increase, not decrease (unless going to 0 when Wave is up)
-                    if (cacheData.robloxUpdateCombo < currentCache.robloxUpdateCombo && cacheData.isDown !== false) {
-                        delete cacheData.robloxUpdateCombo;
-                    }
-                }
+                // NEVER let clients change combo - only admin can set it
+                delete cacheData.robloxUpdateCombo;
+                delete cacheData.lastRobloxCombo;
+                delete cacheData.longestRobloxCombo;
                 
-                // Don't let clients set lastRobloxCombo/longestRobloxCombo to non-zero if server has 0
-                // (prevents old localStorage from polluting new tracking)
-                if (currentCache.lastRobloxCombo === 0 && cacheData.lastRobloxCombo > 0) {
-                    delete cacheData.lastRobloxCombo;
-                }
-                if (currentCache.longestRobloxCombo === 0 && cacheData.longestRobloxCombo > 0) {
-                    delete cacheData.longestRobloxCombo;
-                }
+                // Don't let clients overwrite certain dates
                 if (currentCache.lastDowntimeDate === null && cacheData.lastDowntimeDate) {
                     delete cacheData.lastDowntimeDate;
                 }
