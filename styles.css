@@ -113,16 +113,16 @@ body {
 
 .text-background-layer {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    gap: 20px 80px;
+    gap: 40px 100px;
     transform: rotate(-15deg);
-    animation: textScroll 40s linear infinite;
+    animation: textScroll 60s linear infinite;
 }
 
 .text-background-layer span {
@@ -157,10 +157,10 @@ body {
 
 @keyframes textScroll {
     0% {
-        transform: rotate(-15deg) translateY(0) translateX(0);
+        transform: rotate(-15deg) translate(0, 0);
     }
     100% {
-        transform: rotate(-15deg) translateY(-200px) translateX(-100px);
+        transform: rotate(-15deg) translate(calc(-100% / 3), calc(-100% / 3));
     }
 }
 
