@@ -306,6 +306,116 @@ async function loadData() {
 async function initializeServer() {
     await connectDB();
     await loadData();
+    // Start Wave/Roblox status monitoring
+    startStatusMonitoring();
+}
+
+// Wave and Roblox status monitoring for combo tracking
+let lastKnownWaveStatus = null;
+let lastKnownRobloxVersion = null;
+
+async function checkWaveAndRobloxStatus() {
+    try {
+        // Fetch Wave status
+        const waveResponse = await fetch('https://weao.xyz/api/status/exploits/wave', {
+            headers: { 'User-Agent': 'WEAO-3PService' }
+        });
+        
+        // Fetch Roblox status
+        const robloxResponse = await fetch('https://weao.xyz/api/status/roblox', {
+            headers: { 'User-Agent': 'WEAO-3PService' }
+        });
+        
+        if (!waveResponse.ok || !robloxResponse.ok) {
+            console.log('⚠️ Failed to fetch status from WEAO');
+            return;
+        }
+        
+        const waveData = await waveResponse.json();
+        const robloxData = await robloxResponse.json();
+        
+        const isWaveDown = waveData.working === false;
+        const currentRobloxVersion = robloxData.Windows || null;
+        
+        // Load current cache
+        const cache = await loadWaveCache();
+        const wasDown = cache?.isDown || false;
+        const savedRobloxVersion = cache?.robloxVersionAtDownStart || null;
+        let currentCombo = cache?.robloxUpdateCombo || 0;
+        
+        // Wave just went DOWN
+        if (isWaveDown && !wasDown) {
+            console.log('🔴 Wave went DOWN - resetting combo to 1');
+            await db.collection('waveCache').updateOne(
+                { _id: 'current' },
+                { 
+                    $set: { 
+                        isDown: true,
+                        robloxUpdateCombo: 1,
+                        robloxVersionAtDownStart: currentRobloxVersion,
+                        lastUpdated: Date.now()
+                    } 
+                },
+                { upsert: true }
+            );
+            lastKnownRobloxVersion = currentRobloxVersion;
+        }
+        // Wave is still DOWN - check for Roblox updates
+        else if (isWaveDown && wasDown) {
+            const versionToCompare = savedRobloxVersion || lastKnownRobloxVersion;
+            
+            if (currentRobloxVersion && versionToCompare && 
+                currentRobloxVersion !== versionToCompare) {
+                // Roblox updated while Wave is down - INCREMENT COMBO!
+                const newCombo = (currentCombo || 1) + 1;
+                console.log(`🎮 Roblox updated while Wave down! Combo: ${currentCombo} → ${newCombo}`);
+                console.log(`   Version change: ${versionToCompare} → ${currentRobloxVersion}`);
+                
+                await db.collection('waveCache').updateOne(
+                    { _id: 'current' },
+                    { 
+                        $set: { 
+                            robloxUpdateCombo: newCombo,
+                            robloxVersionAtDownStart: currentRobloxVersion,
+                            lastUpdated: Date.now()
+                        } 
+                    }
+                );
+                lastKnownRobloxVersion = currentRobloxVersion;
+            }
+        }
+        // Wave just went UP
+        else if (!isWaveDown && wasDown) {
+            console.log('🟢 Wave is UP - saving final combo and resetting');
+            const finalCombo = currentCombo || 1;
+            
+            await db.collection('waveCache').updateOne(
+                { _id: 'current' },
+                { 
+                    $set: { 
+                        isDown: false,
+                        lastRobloxCombo: finalCombo,
+                        robloxUpdateCombo: 0,
+                        robloxVersionAtDownStart: null,
+                        lastUpdated: Date.now()
+                    } 
+                }
+            );
+        }
+        
+        lastKnownWaveStatus = isWaveDown;
+        lastKnownRobloxVersion = currentRobloxVersion;
+        
+    } catch (error) {
+        console.error('❌ Error checking Wave/Roblox status:', error.message);
+    }
+}
+
+function startStatusMonitoring() {
+    // Check every 30 seconds
+    console.log('🔄 Starting Wave/Roblox status monitoring (every 30s)');
+    checkWaveAndRobloxStatus(); // Initial check
+    setInterval(checkWaveAndRobloxStatus, 30 * 1000);
 }
 
 initializeServer();
