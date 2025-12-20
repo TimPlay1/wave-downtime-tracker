@@ -322,20 +322,21 @@ async function checkWaveAndRobloxStatus() {
             headers: { 'User-Agent': 'WEAO-3PService' }
         });
         
-        // Fetch Roblox status
-        const robloxResponse = await fetch('https://weao.xyz/api/status/roblox', {
+        // Fetch Roblox version - use correct endpoint!
+        const robloxResponse = await fetch('https://weao.xyz/api/versions/current', {
             headers: { 'User-Agent': 'WEAO-3PService' }
         });
         
         if (!waveResponse.ok || !robloxResponse.ok) {
-            console.log('⚠️ Failed to fetch status from WEAO');
+            console.log('⚠️ Failed to fetch status from WEAO (Wave:', waveResponse.status, ', Roblox:', robloxResponse.status, ')');
             return;
         }
         
         const waveData = await waveResponse.json();
         const robloxData = await robloxResponse.json();
         
-        const isWaveDown = waveData.working === false;
+        // Wave is down when updateStatus is false (not synced with latest Roblox version)
+        const isWaveDown = waveData.updateStatus === false;
         const currentRobloxVersion = robloxData.Windows || null;
         
         // Load current cache
@@ -367,15 +368,29 @@ async function checkWaveAndRobloxStatus() {
         }
         // Wave is still DOWN - check for Roblox updates
         else if (isWaveDown && wasDown) {
-            // Skip combo increment if locked by admin
+            const versionToCompare = savedRobloxVersion || lastKnownRobloxVersion;
+            const robloxUpdated = currentRobloxVersion && versionToCompare && 
+                                  currentRobloxVersion !== versionToCompare;
+            
+            // Skip combo increment if locked by admin, but still update version tracking
             if (isComboLocked) {
-                console.log('🔒 Combo is locked by admin, skipping automatic increment');
+                if (robloxUpdated) {
+                    console.log('🔒 Combo is locked by admin, but updating version tracking');
+                    console.log(`   Version change: ${versionToCompare} → ${currentRobloxVersion}`);
+                    // Update robloxVersionAtDownStart to prevent false increment after unlock
+                    await db.collection('waveCache').updateOne(
+                        { _id: 'current' },
+                        { 
+                            $set: { 
+                                robloxVersionAtDownStart: currentRobloxVersion,
+                                lastUpdated: Date.now()
+                            } 
+                        }
+                    );
+                }
                 lastKnownRobloxVersion = currentRobloxVersion;
             } else {
-                const versionToCompare = savedRobloxVersion || lastKnownRobloxVersion;
-                
-                if (currentRobloxVersion && versionToCompare && 
-                    currentRobloxVersion !== versionToCompare) {
+                if (robloxUpdated) {
                     // Roblox updated while Wave is down - INCREMENT COMBO!
                     const newCombo = (currentCombo || 1) + 1;
                     console.log(`🎮 Roblox updated while Wave down! Combo: ${currentCombo} → ${newCombo}`);
@@ -1315,11 +1330,35 @@ app.post('/api/admin/override-timer', express.json(), async (req, res) => {
             updates.manualTimerOverride = true;
         }
         
-        // Update combo if provided and LOCK it so server monitoring doesn't change it
+        // Update combo if provided
+        // lockCombo parameter controls whether auto-monitoring can change it:
+        //   - lockCombo: true (default) - combo stays fixed, won't change on Roblox updates
+        //   - lockCombo: false - combo will continue to grow on Roblox updates from this value
         if (robloxUpdateCombo !== undefined && robloxUpdateCombo >= 1) {
             updates.robloxUpdateCombo = robloxUpdateCombo;
-            updates.comboLocked = true; // Lock combo so auto-monitoring doesn't change it
-            console.log(`🔒 Admin locked combo to ${robloxUpdateCombo}`);
+            // Default to locked unless explicitly set to false
+            const shouldLock = req.body.lockCombo !== false;
+            updates.comboLocked = shouldLock;
+            
+            // Also sync robloxVersionAtDownStart to current Roblox version to prevent false increments
+            if (!shouldLock) {
+                try {
+                    const robloxResp = await fetch('https://weao.xyz/api/versions/current', {
+                        headers: { 'User-Agent': 'WEAO-3PService' }
+                    });
+                    if (robloxResp.ok) {
+                        const robloxData = await robloxResp.json();
+                        if (robloxData.Windows) {
+                            updates.robloxVersionAtDownStart = robloxData.Windows;
+                            console.log(`📍 Synced robloxVersionAtDownStart to ${robloxData.Windows}`);
+                        }
+                    }
+                } catch (e) {
+                    console.log('⚠️ Could not fetch current Roblox version');
+                }
+            }
+            
+            console.log(`${shouldLock ? '🔒 Admin locked' : '🔓 Admin set'} combo to ${robloxUpdateCombo}`);
         }
         
         // Update robloxVersionAtDownStart if provided
