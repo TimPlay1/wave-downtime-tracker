@@ -173,7 +173,7 @@ async function saveData() {
     }
 }
 
-async function saveWaveCache(cacheData, isAdminRequest = false) {
+async function saveWaveCache(cacheData, isAdminRequest = false, source = 'unknown') {
     try {
         if (db) {
             // Get current cache to check for protected fields
@@ -207,12 +207,13 @@ async function saveWaveCache(cacheData, isAdminRequest = false) {
                 {
                     $set: {
                         ...cacheData,
-                        lastUpdated: Date.now()
+                        lastUpdated: Date.now(),
+                        _lastModifiedBy: source
                     }
                 },
                 { upsert: true }
             );
-            console.log('💾 Wave cache saved to MongoDB');
+            console.log(`💾 Wave cache saved to MongoDB (source: ${source})`);
         }
     } catch (error) {
         console.error('Error saving Wave cache:', error);
@@ -359,7 +360,8 @@ async function checkWaveAndRobloxStatus() {
                         robloxUpdateCombo: 1,
                         robloxVersionAtDownStart: currentRobloxVersion,
                         comboLocked: false, // Reset lock when Wave goes down
-                        lastUpdated: Date.now()
+                        lastUpdated: Date.now(),
+                        _lastModifiedBy: 'server-wave-down'
                     } 
                 },
                 { upsert: true }
@@ -383,7 +385,8 @@ async function checkWaveAndRobloxStatus() {
                         { 
                             $set: { 
                                 robloxVersionAtDownStart: currentRobloxVersion,
-                                lastUpdated: Date.now()
+                                lastUpdated: Date.now(),
+                                _lastModifiedBy: 'server-locked-version-sync'
                             } 
                         }
                     );
@@ -402,7 +405,8 @@ async function checkWaveAndRobloxStatus() {
                             $set: { 
                                 robloxUpdateCombo: newCombo,
                                 robloxVersionAtDownStart: currentRobloxVersion,
-                                lastUpdated: Date.now()
+                                lastUpdated: Date.now(),
+                                _lastModifiedBy: 'server-combo-increment'
                             } 
                         }
                     );
@@ -424,7 +428,8 @@ async function checkWaveAndRobloxStatus() {
                         robloxUpdateCombo: 0,
                         robloxVersionAtDownStart: null,
                         comboLocked: false, // Reset lock when Wave is back up
-                        lastUpdated: Date.now()
+                        lastUpdated: Date.now(),
+                        _lastModifiedBy: 'server-wave-up'
                     } 
                 }
             );
@@ -1280,7 +1285,10 @@ app.post('/api/wave-cache', express.json(), async (req, res) => {
         
         const cacheData = req.body;
         delete cacheData.adminKey; // Don't save admin key to database
-        await saveWaveCache(cacheData, isAdminRequest);
+        
+        // Determine source for debugging
+        const source = isAdminRequest ? 'admin-api' : `client-${origin.split('//')[1]?.split('/')[0] || 'unknown'}`;
+        await saveWaveCache(cacheData, isAdminRequest, source);
         res.json({ success: true, message: 'Cache saved' });
     } catch (error) {
         console.error('Error saving cache:', error);
@@ -1374,7 +1382,7 @@ app.post('/api/admin/override-timer', express.json(), async (req, res) => {
         if (Object.keys(updates).length > 0) {
             await db.collection('waveCache').updateOne(
                 { _id: 'current' },
-                { $set: { ...updates, lastUpdated: Date.now() } }
+                { $set: { ...updates, lastUpdated: Date.now(), _lastModifiedBy: 'admin-override-timer' } }
             );
             
             console.log('⚙️ Timer manually overridden:', updates);
